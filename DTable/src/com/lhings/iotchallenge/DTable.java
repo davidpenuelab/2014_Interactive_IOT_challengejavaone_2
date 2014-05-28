@@ -221,6 +221,7 @@ public class DTable extends LhingsDevice {
         System.out.println("checkout!");
         setLightOn(false);
         setAvailable(false);
+        setAvailableOFF();
 	}
 
     private void setLightOn(boolean value){
@@ -248,13 +249,18 @@ public class DTable extends LhingsDevice {
 			callWebService_available("{\"on\":true, \"hue\":1000}");//red {"on":true, "hue": 1000}
 			sendNotAvailable = true;
 		}
-
+        
 		this.available = available;
         
         if(this.available)
             System.out.println("I am Available right now");
         else
             System.out.println("I am NOT Available right now");
+	}
+
+    private void setAvailableOFF() {
+        callWebService_available("{\"on\":false}");
+        System.out.println("Turning off Available light");
 	}
 
     private void getDevicesFromUser(String apikey){
