@@ -288,12 +288,12 @@ public class DTable extends LhingsDevice {
 			CloseableHttpClient httpclient = HttpClients.createDefault();
 			HttpPost post = new HttpPost("https://www.lhings.com/laas/api/v1/devices/"+uuid+"/actions/notification");
 			post.addHeader("X-Api-Key", apikey);
-            post.setHeader("Content-Type", "application/json");
+//            post.setHeader("Content-Type", "application/json");
 
-            List <NameValuePair> params = new ArrayList<NameValuePair>();
-            params.add(new BasicNameValuePair("text", "hello melon!"));
+            StringEntity entity = new StringEntity("{'name': 'text', 'value': 'Hola melon! como estas?'}");
+            entity.setContentType("application/json");
+            post.setEntity(entity);
             
-            post.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));
 			CloseableHttpResponse response = httpclient.execute(post);
 			if (response.getStatusLine().getStatusCode() != 200) {
 				System.err.println("Device.doAction request failed: " + response.getStatusLine());
@@ -305,7 +305,6 @@ public class DTable extends LhingsDevice {
 			
 		} catch (IOException ex) {
 			ex.printStackTrace(System.err);
-			System.exit(1);
 		}
     }
 
