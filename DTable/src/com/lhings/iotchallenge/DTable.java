@@ -289,6 +289,7 @@ public class DTable extends LhingsDevice {
 			HttpPost post = new HttpPost("https://www.lhings.com/laas/api/v1/devices/"+uuid+"/actions/notifications/");
 			post.addHeader("X-Api-Key", apikey);
             post.setHeader("Content-Type", "application/json");
+            post.setHeader("Accept", "application/json");
 
 //            String toSend = "{\"name\": \"text\",\r\n    \"value\": \"hello melon test\"}";
             StringEntity requestBody = new StringEntity("{\"name\":\"text\",\"value\":\"hello test\"}");
@@ -326,6 +327,23 @@ public class DTable extends LhingsDevice {
          ex.printStackTrace(System.err);
          System.exit(1);
          }
+         
+         
+         
+         
+         String URI =  protocol + LHINGS_URI + API_DEVICE_URI + UUID + API_DEVICE_DOACTION + actionName;
+         
+         String apiKey = UserInfo.getApiKey();
+         HttpPost deviceDoActionRequest =  new HttpPost(URI);
+         
+         deviceDoActionRequest.addHeader("X-Api-Key", apiKey);
+         // set it as StringEntity
+         StringEntity se = new StringEntity(args.toString());
+         deviceDoActionRequest.setEntity(se);
+         // set request's header
+         deviceDoActionRequest.setHeader("Accept", "application/json");
+         deviceDoActionRequest.setHeader("Content-type", "application/json");
+
 
          */
     }
