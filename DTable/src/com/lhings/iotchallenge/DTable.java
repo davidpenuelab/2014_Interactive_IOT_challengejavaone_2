@@ -301,6 +301,7 @@ public class DTable extends LhingsDevice {
             obj_call.put(obj2);
             
 			String input = obj_call.toString();
+			String input = "[]";
             
 			OutputStream os = conn.getOutputStream();
 			os.write(input.getBytes());
@@ -318,6 +319,35 @@ public class DTable extends LhingsDevice {
                 // TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+        
+        try {
+			URL hueColorService = new URL("http://192.168.0.111/api/newdeveloper/lights/4/state");
+			HttpURLConnection conn = (HttpURLConnection) hueColorService.openConnection();
+			conn.setDoOutput(true);
+			conn.setRequestMethod("PUT");
+			conn.setRequestProperty("Content-Type", "application/json");
+            
+			String input = payload;
+            
+			OutputStream os = conn.getOutputStream();
+			os.write(input.getBytes());
+			os.flush();
+            
+			BufferedReader br = new BufferedReader(new InputStreamReader(
+                                                                         (conn.getInputStream())));
+            
+			String output;
+			System.out.println("Output from Server .... \n");
+			while ((output = br.readLine()) != null) {
+				System.out.println(output);
+			}
+            
+			conn.disconnect();
+		} catch (Exception e) {
+                // TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 
         /*
          try {
