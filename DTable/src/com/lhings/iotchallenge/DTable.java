@@ -52,6 +52,7 @@ public class DTable extends LhingsDevice {
     
     private boolean on=false;
 	private boolean available = false;
+    Map<String,String> devices;
     
 	public DTable() {
 		// Co-working space credenti
@@ -211,7 +212,7 @@ public class DTable extends LhingsDevice {
         setLightOn(true);
         setAvailable(true);
         getDevicesFromUser(apikey);//and send welcome, send to desktop app apikey
-        System.out.println("Checked in done with apikey+"+apikey);
+        System.out.println("Checked in done correctly with apikey "+apikey);
 	}
     
     private void doCheckout(String apikey){
@@ -265,6 +266,8 @@ public class DTable extends LhingsDevice {
 
     private void getDevicesFromUser(String apikey){
         System.out.print("TODO: Send Apikey of Coworking to Pereda: i send to plughlings welcome text and Pereda will do welcome in his app");
+        devices = getAllDevicesInAccount(apikey);
+        System.out.println(devices.toString());
     }
     
     private void sendApikeyToCoffee(String apikey){
@@ -275,6 +278,39 @@ public class DTable extends LhingsDevice {
         System.out.println("TODO: Send goodby to Pereda and Lhings");
     }
     
+    
+	private Map<String,String> getAllDevicesInAccount(String apikey) {
+		
+		try {
+			CloseableHttpClient httpclient = HttpClients.createDefault();
+			HttpGet get = new HttpGet("https://www.lhings.com/laas/api/v1/devices/");
+			get.addHeader("X-Api-Key", apikey);
+			CloseableHttpResponse response = httpclient.execute(get);
+			if (response.getStatusLine().getStatusCode() != 200) {
+				System.err.println("Device.list request failed: " + response.getStatusLine());
+				response.close();
+				System.exit(1);
+			}
+			String responseBody = EntityUtils.toString(response.getEntity());
+			response.close();
+			JSONArray listDevices = new JSONArray(responseBody);
+			int numElements = listDevices.length();
+			Map<String,String> results = new HashMap<String, String>();
+			for (int i = 0; i<numElements; i++){
+				JSONObject device = listDevices.getJSONObject(i);
+				String uuid = device.getString("uuid");
+				String name = device.getString("name");
+				results.put(name, uuid);
+			}
+			
+			return results;
+		} catch (IOException ex) {
+			ex.printStackTrace(System.err);
+			System.exit(1);
+		}
+		return null;
+	}
+
 	private void uploadDescriptor(String apikey, String uuid, String descriptor){
 		try {
 			CloseableHttpClient httpclient = HttpClients.createDefault();
@@ -298,38 +334,8 @@ public class DTable extends LhingsDevice {
         
 	}
 	
-	private String createDevice(String apikey, String devName){
-            //register device
-		try {
-			CloseableHttpClient httpclient = HttpClients.createDefault();
-			HttpPost post = new HttpPost("https://www.lhings.com/laas/api/v1/devices/");
-			post.addHeader("X-Api-Key", apikey);
-            post.addHeader("Content-Type", "application/json");
-            
-			StringEntity requestBody = new StringEntity("{ \"name\": \"deviceName\", \"value\": \"" + devName + "\"}");
-			post.setEntity(requestBody);
-			CloseableHttpResponse response = httpclient.execute(post);
-			if (response.getStatusLine().getStatusCode() != 200) {
-				System.err.println("Unable to register device Lamp, request failed: " + response.getStatusLine());
-				response.close();
-				System.exit(1);
-			}
-			String responseBody = EntityUtils.toString(response.getEntity());
-			response.close();
-			JSONObject device = new JSONObject(responseBody);
-			return device.getString("uuid");
-			
-			
-		} catch (IOException ex) {
-			ex.printStackTrace(System.err);
-			System.exit(1);
-		}
-		return null;
-	}
-
-        // ************* private methods (Lamp related) ***************
+    // ************* private methods (Lamp related) ***************
 	private void callWebService_available(String payload) {
-		
 		try {
 			URL hueColorService = new URL(
 					"http://192.168.0.111/api/newdeveloper/lights/4/state");
@@ -361,7 +367,6 @@ public class DTable extends LhingsDevice {
 	} 
 
     private void callWebService_lightOnOff(String payload) {
-		
 		try {
 			URL hueColorService = new URL(
                                           "http://192.168.0.111/api/newdeveloper/lights/3/state");
@@ -398,37 +403,5 @@ public class DTable extends LhingsDevice {
 		DTable table = new DTable();
 
 	}
-
-	private Map<String,String> getAllDevicesInAccount(String apikey) {
-		
-		try {
-			CloseableHttpClient httpclient = HttpClients.createDefault();
-			HttpGet get = new HttpGet("https://www.lhings.com/laas/api/v1/devices/");
-			get.addHeader("X-Api-Key", apikey);
-			CloseableHttpResponse response = httpclient.execute(get);
-			if (response.getStatusLine().getStatusCode() != 200) {
-				System.err.println("Device.list request failed: " + response.getStatusLine());
-				response.close();
-				System.exit(1);
-			}
-			String responseBody = EntityUtils.toString(response.getEntity());
-			response.close();
-			JSONArray listDevices = new JSONArray(responseBody);
-			int numElements = listDevices.length();
-			Map<String,String> results = new HashMap<String, String>();
-			for (int i = 0; i<numElements; i++){
-				JSONObject device = listDevices.getJSONObject(i);
-				String uuid = device.getString("uuid");
-				String name = device.getString("name");
-				results.put(name, uuid);
-			}
-			
-			return results;
-		} catch (IOException ex) {
-			ex.printStackTrace(System.err);
-			System.exit(1);
-		}
-		return null;
-	} 
 
 }
