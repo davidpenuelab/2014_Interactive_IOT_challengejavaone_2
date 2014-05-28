@@ -51,7 +51,7 @@ public class DTable extends LhingsDevice {
     static Thread rfid_thread;
     static RP_Rfid rfid;
     
-    private boolean on=false;
+    private boolean on=true;
     
 	public DTable() {
 		// Co-working space credenti
