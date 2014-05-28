@@ -38,7 +38,6 @@ public class DTable extends LhingsDevice {
 
 	private String user;
 	private String userApikey;
-	private boolean available = true;
 
 	private boolean sendCheckedIn = false;
 	private boolean sendCheckedOut = false;
@@ -51,7 +50,8 @@ public class DTable extends LhingsDevice {
     static Thread rfid_thread;
     static RP_Rfid rfid;
     
-    private boolean on=true;
+    private boolean on=false;
+	private boolean available = false;
     
 	public DTable() {
 		// Co-working space credenti
@@ -211,12 +211,22 @@ public class DTable extends LhingsDevice {
         getDevicesFromUser(apikey);//and send welcome, send to desktop app apikey
         System.out.println("Checked in done with apikey+"+apikey);
 	}
+    
+    private void doCheckout(String apikey){
+            // llamamos al shutdown de DTable y DLamp para terminarlos, ponemos offline DCoffeeMakerU
+            // se utiliza el servicio Device.endSession para poner offline DCoffeMakerU
+        sendGoodByeMessage(apikey);
+        System.out.println("checkout!");
+        setLightOn(false);
+        setAvailable(false);
+	}
+
     private void setLightOn(boolean value){
         if (this.on == false && value == true){
-			callWebService_lightOnOff("{\"on\":false}");
+			callWebService_lightOnOff("{\"on\":true, \"hue\":0}");
 		}
 		else if (this.on == true && value == false){
-			callWebService_lightOnOff("{\"on\":true, \"hue\":0}");
+			callWebService_lightOnOff("{\"on\":false}");
 		}
         
 		this.on = value;
@@ -227,25 +237,7 @@ public class DTable extends LhingsDevice {
             System.out.println("Light OFF");
     }
     
-	private void doCheckout(String apikey){
-		// llamamos al shutdown de DTable y DLamp para terminarlos, ponemos offline DCoffeeMakerU
-		// se utiliza el servicio Device.endSession para poner offline DCoffeMakerU
-        sendGoodByeMessage(apikey);
-        System.out.println("checkout!");
-	}
-    
-    private void getDevicesFromUser(String apikey){
-        System.out.print("TODO: Send Apikey of Coworking to Pereda: i send to plughlings welcome text and Pereda will do welcome in his app");
-    }
-    private void sendApikeyToCoffee(String apikey){
-        System.out.println("TODO: Send Apikey of user to coffeemaker");
-    }
-    
-    private void sendGoodByeMessage(String apikey){
-        System.out.println("TODO: Send goodby to Pereda and Lhings");
-    }
 	private void setAvailable(boolean available) {
-		
 		if (this.available == false && available == true){
 			callWebService_available("{\"on\":true, \"hue\":25000}");//green {"on":true, "hue": 25000}
 			sendAvailable = true;
@@ -254,7 +246,6 @@ public class DTable extends LhingsDevice {
 			callWebService_available("{\"on\":true, \"hue\":1000}");//red {"on":true, "hue": 1000}
 			sendNotAvailable = true;
 		}
-			
 
 		this.available = available;
         
@@ -263,6 +254,18 @@ public class DTable extends LhingsDevice {
         else
             System.out.println("I am NOT Available right now");
 	}
+
+    private void getDevicesFromUser(String apikey){
+        System.out.print("TODO: Send Apikey of Coworking to Pereda: i send to plughlings welcome text and Pereda will do welcome in his app");
+    }
+    
+    private void sendApikeyToCoffee(String apikey){
+        System.out.println("TODO: Send Apikey of user to coffeemaker");
+    }
+    
+    private void sendGoodByeMessage(String apikey){
+        System.out.println("TODO: Send goodby to Pereda and Lhings");
+    }
     
 	private void uploadDescriptor(String apikey, String uuid, String descriptor){
 		try {
