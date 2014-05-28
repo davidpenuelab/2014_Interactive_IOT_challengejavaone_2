@@ -284,85 +284,109 @@ public class DTable extends LhingsDevice {
     }
     
     private void sendMessageLhings(String apikey, String uuid, String message){
+        CloseableHttpClient httpClient=null;
+        CloseableHttpResponse response=null;
         try {
-            CloseableHttpClient httpclient = HttpClients.createDefault();
-            HttpPost post = new HttpPost("https://www.lhings.com/laas/api/v1/devices/" + uuid + "/actions/viabrate");
-            post.addHeader("X-Api-Key", apikey);
-            post.setHeader("Accept", "application/json");
-            post.setHeader("Content-type", "application/json");
-            StringEntity requestBody = new StringEntity("[{ \"name\": \"text\", \"value\": \"Hello testAPP\"}]");
-            post.setEntity(requestBody);
-            CloseableHttpResponse response = httpclient.execute(post);
-            if (response.getStatusLine().getStatusCode() != 200) {
-                System.err.println("Unable to doAction for device " + uuid + ", request failed: " + response.getStatusLine());
-                response.close();
-                System.exit(1);
-            }
-            String responseBody = EntityUtils.toString(response.getEntity());
-            response.close();
             
-        } catch (IOException ex) {
-            ex.printStackTrace(System.err);
-            System.exit(1);
+            httpClient = HttpClients.createDefault();
+            URI uri = new URI("https://www.lhings.com/laas/api/v1/devices/"+uuid+"/actions/notifications");
+            HttpPost httpPost = new HttpPost(uri);
+            
+            httpPost.setHeader("X-Api-Key", apikey);
+            httpPost.setHeader("Accept", "application/json");
+            httpPost.setHeader("Content-type", "application/json");
+            String json="[{ \"name\": \"text\", \"value\": \"Hello testAPP\"}]";
+            HttpEntity postBody = new StringEntity(json);
+            httpPost.setEntity(postBody);
+            
+            response = httpClient.execute(httpPost);
+            
+            if (response.getStatusLine().getStatusCode() != 200) {
+                System.out.println("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
+                return;
+            }
+            
+            BufferedReader br = new BufferedReader(new InputStreamReader(
+                                                                         (response.getEntity().getContent())));
+            
+            String output;
+            System.out.println("Output from Server .... \n");
+            while ((output = br.readLine()) != null) {
+                System.out.println(output);
+            }
+        } catch (IOException | URISyntaxException e) {
+            System.out.println("Error "+e.toString());
+        } finally {
+            try{
+                if(response!=null){
+                    response.close();
+                }
+                if(httpClient!=null){
+                    httpClient.close();
+                }
+            }catch(IOException ex) {
+                System.out.println("Finally Error "+ex.toString());
+            }
         }
-
         
-        
-//        try {
-//            System.out.println("1try same code as JOSE");
-//
-//			URL actionURL = new URL("https://www.lhings.com/laas/api/v1/devices/"+uuid+"/actions/viabrate");
-//			HttpURLConnection conn = (HttpURLConnection) actionURL.openConnection();
-//			conn.setDoOutput(true);
-//			conn.setRequestMethod("PUT");
-//			conn.setRequestProperty("X-Api-Key", apikey);
-//			conn.setRequestProperty("Content-Type", "application/json");
-//            System.out.println("2");
-//            
-//            JSONArray obj_call = new JSONArray();
-//            
-//            JSONObject obj1 = new JSONObject();
-//            obj1.put("name","text");
-//            obj_call.put(obj1);
-//            JSONObject obj2 = new JSONObject();
-//            obj2.put("value","Hello test melon");
-//            obj_call.put(obj2);
-//            
-////			String input = obj_call.toString();
-//			String input = "[]";
-//            System.out.println("3");
-//            
-//			OutputStream os = conn.getOutputStream();
-//			os.write(input.getBytes());
-//			os.flush();
-//            
-//            System.out.println("4");
-//			BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
-//            
-//			String output;
-//			System.out.println("Output from Server .... \n");
-//			while ((output = br.readLine()) != null) {
-//				System.out.println(output);
-//			}
-//            System.out.println("5");
-//			conn.disconnect();
-//		} catch (Exception e) {
-//                // TODO Auto-generated catch block
-//            System.out.println("try same code as JOSE");
-//
-//			e.printStackTrace();
-//		}
         
         /*
+       try {
+            System.out.println("1try same code as JOSE");
+
+			URL actionURL = new URL("https://www.lhings.com/laas/api/v1/devices/"+uuid+"/actions/viabrate");
+			HttpURLConnection conn = (HttpURLConnection) actionURL.openConnection();
+			conn.setDoOutput(true);
+			conn.setRequestMethod("PUT");
+			conn.setRequestProperty("X-Api-Key", apikey);
+			conn.setRequestProperty("Content-Type", "application/json");
+            System.out.println("2");
+            
+            JSONArray obj_call = new JSONArray();
+            
+            JSONObject obj1 = new JSONObject();
+            obj1.put("name","text");
+            obj_call.put(obj1);
+            JSONObject obj2 = new JSONObject();
+            obj2.put("value","Hello test melon");
+            obj_call.put(obj2);
+            
+//			String input = obj_call.toString();
+			String input = "[]";
+            System.out.println("3");
+            
+			OutputStream os = conn.getOutputStream();
+			os.write(input.getBytes());
+			os.flush();
+            
+            System.out.println("4");
+			BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+            
+			String output;
+			System.out.println("Output from Server .... \n");
+			while ((output = br.readLine()) != null) {
+				System.out.println(output);
+			}
+            System.out.println("5");
+			conn.disconnect();
+		} catch (Exception e) {
+                // TODO Auto-generated catch block
+            System.out.println("try same code as JOSE");
+
+			e.printStackTrace();
+		}
+        
          try {
          CloseableHttpClient httpclient = HttpClients.createDefault();
-         HttpPost post = new HttpPost("https://www.lhings.com/laas/api/v1/devices/" + uuid + "/");
+         HttpPost post = new HttpPost("https://www.lhings.com/laas/api/v1/devices/" + uuid + "/actions/viabrate");
          post.addHeader("X-Api-Key", apikey);
-         StringEntity requestBody = new StringEntity(descriptor);
+         post.setHeader("Accept", "application/json");
+         post.setHeader("Content-type", "application/json");
+         StringEntity requestBody = new StringEntity("[{ \"name\": \"text\", \"value\": \"Hello testAPP\"}]");
          post.setEntity(requestBody);
          CloseableHttpResponse response = httpclient.execute(post);
          if (response.getStatusLine().getStatusCode() != 200) {
-         System.err.println("Unable to upload descriptor for device " + uuid + ", request failed: " + response.getStatusLine());
+         System.err.println("Unable to doAction for device " + uuid + ", request failed: " + response.getStatusLine());
          response.close();
          System.exit(1);
          }
@@ -373,8 +397,6 @@ public class DTable extends LhingsDevice {
          ex.printStackTrace(System.err);
          System.exit(1);
          }
-         
-         
          
          
          String URI =  protocol + LHINGS_URI + API_DEVICE_URI + UUID + API_DEVICE_DOACTION + actionName;
