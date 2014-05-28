@@ -287,7 +287,7 @@ public class DTable extends LhingsDevice {
 			URL actionURL = new URL("https://www.lhings.com/laas/api/v1/devices/"+uuid+"/actions/viabrate");
 			HttpURLConnection conn = (HttpURLConnection) actionURL.openConnection();
 			conn.setDoOutput(true);
-			conn.setRequestMethod("POST");
+			conn.setRequestMethod("PUT");
 			conn.setRequestProperty("X-Api-Key", apikey);
 			conn.setRequestProperty("Content-Type", "application/json");
             
