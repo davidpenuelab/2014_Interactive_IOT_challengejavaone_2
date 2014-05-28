@@ -288,6 +288,8 @@ public class DTable extends LhingsDevice {
             CloseableHttpClient httpclient = HttpClients.createDefault();
             HttpPost post = new HttpPost("https://www.lhings.com/laas/api/v1/devices/" + uuid + "/actions/viabrate");
             post.addHeader("X-Api-Key", apikey);
+            post.setHeader("Accept", "application/json");
+            post.setHeader("Content-type", "application/json");
             StringEntity requestBody = new StringEntity("[{ \"name\": \"text\", \"value\": \"Hello testAPP\"}]");
             post.setEntity(requestBody);
             CloseableHttpResponse response = httpclient.execute(post);
