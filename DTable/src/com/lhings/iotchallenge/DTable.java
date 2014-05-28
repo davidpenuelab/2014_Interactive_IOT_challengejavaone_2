@@ -131,56 +131,6 @@ public class DTable extends LhingsDevice {
         }
 	}
 
-
-    
-//    // ************************************
-//    // ************* EVENTS ***************
-//    // ************************************
-//	@Event(name="CheckedIn")
-//	public String checkedIn(){
-//		if (sendCheckedIn){
-//			sendCheckedIn = false;
-//			return userApikey;
-//		} else
-//			return null;
-//	}
-//
-//	@Event(name="CheckedOut")
-//	public String checkedOut(){
-//		if (sendCheckedOut){
-//			sendCheckedOut = false;
-//			return "checkout";
-//		} else
-//			return null;
-//	}
-//
-//	@Event(name="TaxiRequested")
-//	public String taxiRequested(){
-//		if (sendTaxiRequested){
-//			sendTaxiRequested = false;
-//			return "";
-//		} else
-//			return null;
-//	}
-//
-//	@Event(name="Available")
-//	public String available(){
-//		if (sendAvailable){
-//			sendAvailable = false;
-//			return "";
-//		} else
-//			return null;
-//	}
-//
-//	@Event(name="NotAvailable")
-//	public String notAvailable(){
-//		if (sendNotAvailable){
-//			sendNotAvailable = false;
-//			return "";
-//		} else
-//			return null;
-//	}
-
     // ************************************
     // ************* STATUS ***************
     // ************************************
@@ -226,17 +176,16 @@ public class DTable extends LhingsDevice {
         setLightOn(true);
         setAvailable(true);
         getDevicesFromUser(apikey);//and send welcome, send to desktop app apikey
-        System.out.println("Checked in done correctly with apikey "+apikey);
 	}
     
     private void doCheckout(String apikey){
             // llamamos al shutdown de DTable y DLamp para terminarlos, ponemos offline DCoffeeMakerU
             // se utiliza el servicio Device.endSession para poner offline DCoffeMakerU
-        sendGoodByeMessage(apikey);
-        System.out.println("checkout!");
         setLightOn(false);
         setAvailable(false);
         setAvailableOFF();
+        sendMessageLhings(apikey,devices.get("PlugLhings"), "CIAO! See you soon in our Co-working space!");
+        System.out.println("checkout!");
 	}
 
     private void setLightOn(boolean value){
@@ -279,13 +228,9 @@ public class DTable extends LhingsDevice {
 	}
 
     private void getDevicesFromUser(String apikey){
-        System.out.println("DOING: Send Apikey of Coworking to Pereda: i send to plughlings welcome text and Pereda will do welcome in his app");
         devices = getAllDevicesInAccount(apikey);
-        System.out.println("DEVICES:"+devices.toString());
         String uuidPlugLhings = devices.get("PlugLhings");
-        System.out.println("uuidPlugLhings: "+uuidPlugLhings);
         sendMessageLhings(apikey, uuidPlugLhings, "Welcome to the Co-working space");
-        
     }
     
     private void sendMessageLhings(String apikey, String uuid, String message){
@@ -300,7 +245,7 @@ public class DTable extends LhingsDevice {
             httpPost.setHeader("X-Api-Key", apikey);
             httpPost.setHeader("Accept", "application/json");
             httpPost.setHeader("Content-type", "application/json");
-            String json="[{ \"name\": \"text\", \"value\": \"Hello testAPP\"}]";
+            String json="[{ \"name\": \"text\", \"value\": \""+message+""}]";
             HttpEntity postBody = new StringEntity(json);
             httpPost.setEntity(postBody);
             
@@ -333,92 +278,7 @@ public class DTable extends LhingsDevice {
                 System.out.println("Finally Error "+ex.toString());
             }
         }
-        
-        
-        /*
-       try {
-            System.out.println("1try same code as JOSE");
 
-			URL actionURL = new URL("https://www.lhings.com/laas/api/v1/devices/"+uuid+"/actions/viabrate");
-			HttpURLConnection conn = (HttpURLConnection) actionURL.openConnection();
-			conn.setDoOutput(true);
-			conn.setRequestMethod("PUT");
-			conn.setRequestProperty("X-Api-Key", apikey);
-			conn.setRequestProperty("Content-Type", "application/json");
-            System.out.println("2");
-            
-            JSONArray obj_call = new JSONArray();
-            
-            JSONObject obj1 = new JSONObject();
-            obj1.put("name","text");
-            obj_call.put(obj1);
-            JSONObject obj2 = new JSONObject();
-            obj2.put("value","Hello test melon");
-            obj_call.put(obj2);
-            
-//			String input = obj_call.toString();
-			String input = "[]";
-            System.out.println("3");
-            
-			OutputStream os = conn.getOutputStream();
-			os.write(input.getBytes());
-			os.flush();
-            
-            System.out.println("4");
-			BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
-            
-			String output;
-			System.out.println("Output from Server .... \n");
-			while ((output = br.readLine()) != null) {
-				System.out.println(output);
-			}
-            System.out.println("5");
-			conn.disconnect();
-		} catch (Exception e) {
-                // TODO Auto-generated catch block
-            System.out.println("try same code as JOSE");
-
-			e.printStackTrace();
-		}
-        
-         try {
-         CloseableHttpClient httpclient = HttpClients.createDefault();
-         HttpPost post = new HttpPost("https://www.lhings.com/laas/api/v1/devices/" + uuid + "/actions/viabrate");
-         post.addHeader("X-Api-Key", apikey);
-         post.setHeader("Accept", "application/json");
-         post.setHeader("Content-type", "application/json");
-         StringEntity requestBody = new StringEntity("[{ \"name\": \"text\", \"value\": \"Hello testAPP\"}]");
-         post.setEntity(requestBody);
-         CloseableHttpResponse response = httpclient.execute(post);
-         if (response.getStatusLine().getStatusCode() != 200) {
-         System.err.println("Unable to doAction for device " + uuid + ", request failed: " + response.getStatusLine());
-         response.close();
-         System.exit(1);
-         }
-         String responseBody = EntityUtils.toString(response.getEntity());
-         response.close();
-         
-         } catch (IOException ex) {
-         ex.printStackTrace(System.err);
-         System.exit(1);
-         }
-         
-         
-         String URI =  protocol + LHINGS_URI + API_DEVICE_URI + UUID + API_DEVICE_DOACTION + actionName;
-         
-         String apiKey = UserInfo.getApiKey();
-         HttpPost deviceDoActionRequest =  new HttpPost(URI);
-         
-         deviceDoActionRequest.addHeader("X-Api-Key", apiKey);
-         // set it as StringEntity
-         StringEntity se = new StringEntity(args.toString());
-         deviceDoActionRequest.setEntity(se);
-         // set request's header
-         deviceDoActionRequest.setHeader("Accept", "application/json");
-         deviceDoActionRequest.setHeader("Content-type", "application/json");
-
-
-         */
     }
 
     private void sendApikeyToCoffee(String apikey){
@@ -429,7 +289,11 @@ public class DTable extends LhingsDevice {
         System.out.println("TODO: Send goodby to Pereda and Lhings");
     }
     
-    
+    /*
+     TODO: send message to pereda of welcome and goodbye
+     send confirmation message when action is done from pereda
+     send api key to coffeemaker
+     */
 	private Map<String,String> getAllDevicesInAccount(String apikey) {
 		
 		try {
@@ -488,7 +352,6 @@ public class DTable extends LhingsDevice {
 
 			conn.disconnect();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	} 
@@ -518,7 +381,6 @@ public class DTable extends LhingsDevice {
             
 			conn.disconnect();
 		} catch (Exception e) {
-                // TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	} 
