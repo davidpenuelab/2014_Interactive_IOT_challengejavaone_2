@@ -286,7 +286,7 @@ public class DTable extends LhingsDevice {
         
 		try {
 			CloseableHttpClient httpclient = HttpClients.createDefault();
-			HttpPost post = new HttpPost("https://www.lhings.com/laas/api/v1/devices/"+uuid+"/actions/NOTIFICATIONS");
+			HttpPost post = new HttpPost("https://www.lhings.com/laas/api/v1/devices/"+uuid+"/actions/viabrate");
 			post.addHeader("X-Api-Key", apikey);
             post.setHeader("Content-Type", "application/json");
 //            post.setHeader("Accept", "application/json");
@@ -303,7 +303,7 @@ public class DTable extends LhingsDevice {
             
             String toSend = obj_call.toString();
             
-            StringEntity requestBody = new StringEntity(toSend);
+            StringEntity requestBody = new StringEntity("[]");
             post.setEntity(requestBody);
             CloseableHttpResponse response = httpclient.execute(post);
             if (response.getStatusLine().getStatusCode() != 200) {
