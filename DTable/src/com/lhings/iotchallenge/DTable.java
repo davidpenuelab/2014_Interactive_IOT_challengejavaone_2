@@ -286,10 +286,10 @@ public class DTable extends LhingsDevice {
         
 		try {
 			CloseableHttpClient httpclient = HttpClients.createDefault();
-			HttpPost post = new HttpPost("https://www.lhings.com/laas/api/v1/devices/"+uuid+"/actions/notifications/");
+			HttpPost post = new HttpPost("https://www.lhings.com/laas/api/v1/devices/"+uuid+"/actions/Notifications");
 			post.addHeader("X-Api-Key", apikey);
             post.setHeader("Content-Type", "application/json");
-            post.setHeader("Accept", "application/json");
+//            post.setHeader("Accept", "application/json");
 
 //            String toSend = "{\"name\": \"text\",\r\n    \"value\": \"hello melon test\"}";
             JSONArray obj_call = new JSONArray();
