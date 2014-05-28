@@ -308,7 +308,7 @@ public class DTable extends LhingsDevice {
             CloseableHttpResponse response = httpclient.execute(post);
             if (response.getStatusLine().getStatusCode() != 200) {
                 System.err.println("https://www.lhings.com/laas/api/v1/devices/"+uuid+"/actions/notifications/");
-                System.err.println("Unable do action for device " + uuid + " and api key "+apikey+" , request failed: " + response.getStatusLine());
+                System.err.println("Unable do action for device " + uuid + " and api key "+apikey+" , message sent: "+toSend+" request failed: " + response.getStatusLine());
                 response.close();
             }
             String responseBody = EntityUtils.toString(response.getEntity());
