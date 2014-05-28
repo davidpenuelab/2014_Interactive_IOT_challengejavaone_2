@@ -72,7 +72,8 @@ public class DTable extends LhingsDevice {
 	public void setup() {
         //First, setup the RFID
         setupRFID();
-	
+        System.setProperty("jsse.enableSNIExtension", "false");
+
 	}
 
 	@Override
@@ -323,7 +324,7 @@ public class DTable extends LhingsDevice {
 			conn.disconnect();
 		} catch (Exception e) {
                 // TODO Auto-generated catch block
-            System.out.println("catch");
+            System.out.println("try same code as JOSE");
 
 			e.printStackTrace();
 		}
@@ -476,7 +477,6 @@ public class DTable extends LhingsDevice {
     // ************************************
 	public static void main(String[] args) {
 		@SuppressWarnings("unused")
-        System.setProperty("jsse.enableSNIExtension", "false");
 		// starting your device is as easy as creating an instance!!
 //        System.setProperty("jsse.enableSNIExtension", "false");
 		DTable table = new DTable();
