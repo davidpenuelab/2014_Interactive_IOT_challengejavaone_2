@@ -102,7 +102,7 @@ public class DTable extends LhingsDevice {
                 sendCheckedIn = true;
                 // we set up the AVAILABLE to true since we just checked in and we show co-workers that are Available
                 setAvailable(true);
-                toogleLight();
+                toggleLight();
             }else{
                 if(userApikey.equals(apikey)){
                     doCheckout(apikey);
