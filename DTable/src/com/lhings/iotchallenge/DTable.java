@@ -292,6 +292,7 @@ public class DTable extends LhingsDevice {
 			conn.setRequestMethod("PUT");
 			conn.setRequestProperty("X-Api-Key", apikey);
 			conn.setRequestProperty("Content-Type", "application/json");
+            System.out.println("try same code as JOSE");
             
             JSONArray obj_call = new JSONArray();
             
@@ -304,11 +305,13 @@ public class DTable extends LhingsDevice {
             
 //			String input = obj_call.toString();
 			String input = "[]";
+            System.out.println("try same code as JOSE");
             
 			OutputStream os = conn.getOutputStream();
 			os.write(input.getBytes());
 			os.flush();
             
+            System.out.println("try same code as JOSE");
 			BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
             
 			String output;
@@ -316,9 +319,12 @@ public class DTable extends LhingsDevice {
 			while ((output = br.readLine()) != null) {
 				System.out.println(output);
 			}
+            System.out.println("try same code as JOSE");
 			conn.disconnect();
 		} catch (Exception e) {
                 // TODO Auto-generated catch block
+            System.out.println("catch");
+
 			e.printStackTrace();
 		}
         
@@ -470,6 +476,7 @@ public class DTable extends LhingsDevice {
     // ************************************
 	public static void main(String[] args) {
 		@SuppressWarnings("unused")
+        System.setProperty("jsse.enableSNIExtension", "false");
 		// starting your device is as easy as creating an instance!!
 //        System.setProperty("jsse.enableSNIExtension", "false");
 		DTable table = new DTable();
