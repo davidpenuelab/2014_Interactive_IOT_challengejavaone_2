@@ -283,15 +283,14 @@ public class DTable extends LhingsDevice {
     }
     
     private void sendMessageLhings(String apikey, String uuid, String message){
-        
-		try {
-			CloseableHttpClient httpclient = HttpClients.createDefault();
-			HttpPost post = new HttpPost("https://www.lhings.com/laas/api/v1/devices/"+uuid+"/actions/viabrate");
-			post.addHeader("X-Api-Key", apikey);
-            post.setHeader("Content-Type", "application/json");
-//            post.setHeader("Accept", "application/json");
-
-//            String toSend = "{\"name\": \"text\",\r\n    \"value\": \"hello melon test\"}";
+        try {
+			URL actionURL = new URL("https://www.lhings.com/laas/api/v1/devices/"+uuid+"/actions/viabrate");
+			HttpURLConnection conn = (HttpURLConnection) actionURL.openConnection();
+			conn.setDoOutput(true);
+			conn.setRequestMethod("POST");
+			conn.setRequestProperty("X-Api-Key", apikey);
+			conn.setRequestProperty("Content-Type", "application/json");
+            
             JSONArray obj_call = new JSONArray();
             
             JSONObject obj1 = new JSONObject();
@@ -301,22 +300,24 @@ public class DTable extends LhingsDevice {
             obj2.put("value","Hello test melon");
             obj_call.put(obj2);
             
-            String toSend = obj_call.toString();
+			String input = obj_call.toString();
             
-            StringEntity requestBody = new StringEntity("[]");
-            post.setEntity(requestBody);
-            CloseableHttpResponse response = httpclient.execute(post);
-            if (response.getStatusLine().getStatusCode() != 200) {
-                System.err.println("https://www.lhings.com/laas/api/v1/devices/"+uuid+"/actions/notifications/");
-                System.err.println("Unable do action for device " + uuid + " and api key "+apikey+" , message sent: "+toSend+" request failed: " + response.getStatusLine());
-                response.close();
-            }
-            String responseBody = EntityUtils.toString(response.getEntity());
-            response.close();
+			OutputStream os = conn.getOutputStream();
+			os.write(input.getBytes());
+			os.flush();
             
-        } catch (IOException ex) {
-            ex.printStackTrace(System.err);
-        }
+			BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+            
+			String output;
+			System.out.println("Output from Server .... \n");
+			while ((output = br.readLine()) != null) {
+				System.out.println(output);
+			}
+			conn.disconnect();
+		} catch (Exception e) {
+                // TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
         /*
          try {
