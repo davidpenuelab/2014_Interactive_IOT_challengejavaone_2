@@ -194,16 +194,19 @@ public class DTable extends LhingsDevice {
     
     }
 
+    @Action (name = "toggleLight", description = "Toggle light on/off ", argumentNames = {}, argumentTypes = {})
+    private void toggleLight(){
+        setLightOn(!on);
+    }
     @Action (name = "requestTaxi", description = "Requests a taxi", argumentNames = {}, argumentTypes = {})
 	private void requestTaxi(){
         System.out.println("TODO: Request a Taxi!");
 	}
 
-    @Action (name = "toggleLight", description = "Toggle light on/off ", argumentNames = {}, argumentTypes = {})
-    private void toggleLight(){
-        setLightOn(!on);
-    }
-    
+    // ************************************
+    // ************* CUSTOM METHODS *******
+    // ************************************
+
 	private void doCheckin(String apikey){
         sendApikeyToCoffee(apikey);
         setLightOn(true);
