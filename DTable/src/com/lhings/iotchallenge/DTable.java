@@ -286,7 +286,7 @@ public class DTable extends LhingsDevice {
         
 		try {
 			CloseableHttpClient httpclient = HttpClients.createDefault();
-			HttpPost post = new HttpPost("https://www.lhings.com/laas/api/v1/devices/"+uuid+"/actions/Notifications");
+			HttpPost post = new HttpPost("https://www.lhings.com/laas/api/v1/devices/"+uuid+"/actions/NOTIFICATIONS");
 			post.addHeader("X-Api-Key", apikey);
             post.setHeader("Content-Type", "application/json");
 //            post.setHeader("Accept", "application/json");
