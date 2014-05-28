@@ -500,7 +500,7 @@ public class DTable extends LhingsDevice {
 	public static void main(String[] args) {
 		@SuppressWarnings("unused")
 		// starting your device is as easy as creating an instance!!
-        System.setProperty("jsse.enableSNIExtension", "false");
+//        System.setProperty("jsse.enableSNIExtension", "false");
 		DTable table = new DTable();
 
 	}
