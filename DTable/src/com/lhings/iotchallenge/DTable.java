@@ -286,19 +286,17 @@ public class DTable extends LhingsDevice {
         
 		try {
 			CloseableHttpClient httpclient = HttpClients.createDefault();
-			HttpPost post = new HttpPost("https://www.lhings.com/laas/api/v1/devices/"+uuid+"/actions/notifications");
+			HttpPost post = new HttpPost("https://www.lhings.com/laas/api/v1/devices/"+uuid+"/actions/notifications/");
 			post.addHeader("X-Api-Key", apikey);
             post.setHeader("Content-Type", "application/json");
 
 //            String toSend = "{\"name\": \"text\",\r\n    \"value\": \"hello melon test\"}";
-            String toSend = "{ \"name\": \"text\", \"value\": \"hello test\"}";
-            StringEntity requestBody = new StringEntity(toSend);
+            StringEntity requestBody = new StringEntity("{ \"name\": \"text\", \"value\": \"hello test\"}");
             post.setEntity(requestBody);
             CloseableHttpResponse response = httpclient.execute(post);
             if (response.getStatusLine().getStatusCode() != 200) {
                 System.err.println("Unable do action for device " + uuid + ", request failed: " + response.getStatusLine());
                 response.close();
-                System.exit(1);
             }
             String responseBody = EntityUtils.toString(response.getEntity());
             response.close();
