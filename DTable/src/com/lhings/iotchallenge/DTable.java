@@ -204,7 +204,7 @@ public class DTable extends LhingsDevice {
 	}
 
     // ************************************
-    // ************* CUSTOM METHODS *******
+    // ************* OTHER METHODS ********
     // ************************************
 
 	private void doCheckin(String apikey){
@@ -265,11 +265,40 @@ public class DTable extends LhingsDevice {
 	}
 
     private void getDevicesFromUser(String apikey){
-        System.out.print("TODO: Send Apikey of Coworking to Pereda: i send to plughlings welcome text and Pereda will do welcome in his app");
+        System.out.println("DOING: Send Apikey of Coworking to Pereda: i send to plughlings welcome text and Pereda will do welcome in his app");
         devices = getAllDevicesInAccount(apikey);
         System.out.println("DEVICES:"+devices.toString());
+        String uuidPlugLhings = devices.get("PlugLhings");
+        System.out.println("uuidPlugLhings: "+uuidPlugLhings);
+        sendMessageLhings(uuidPlugLhings, "Welcome to the Co-working space");
+        
     }
     
+    private void sendMessageLhings(String apikey, String uuid, String message){
+        
+		try {
+			CloseableHttpClient httpclient = HttpClients.createDefault();
+			HttpPost post = new HttpGet("https://www.lhings.com/laas/api/v1/devices/"+uuid+"/actions/notification");
+			post.addHeader("X-Api-Key", apikey);
+            post.setHeader("Content-Type", "application/json");
+
+            post.setEntity(new UrlEncodedFormEntity(new BasicNameValuePair("text", "Welcome melon!")));
+
+			CloseableHttpResponse response = httpclient.execute(post);
+			if (response.getStatusLine().getStatusCode() != 200) {
+				System.err.println("Device.doAction request failed: " + response.getStatusLine());
+				response.close();
+				System.exit(1);
+			}
+			String responseBody = EntityUtils.toString(response.getEntity());
+			response.close();
+			
+		} catch (IOException ex) {
+			ex.printStackTrace(System.err);
+			System.exit(1);
+		}
+    }
+
     private void sendApikeyToCoffee(String apikey){
         System.out.println("TODO: Send Apikey of user to coffeemaker");
     }
@@ -311,34 +340,10 @@ public class DTable extends LhingsDevice {
 		return null;
 	}
 
-	private void uploadDescriptor(String apikey, String uuid, String descriptor){
-		try {
-			CloseableHttpClient httpclient = HttpClients.createDefault();
-			HttpPost post = new HttpPost("https://www.lhings.com/laas/api/v1/devices/" + uuid + "/");
-			post.addHeader("X-Api-Key", apikey);
-			StringEntity requestBody = new StringEntity(descriptor);
-			post.setEntity(requestBody);
-			CloseableHttpResponse response = httpclient.execute(post);
-			if (response.getStatusLine().getStatusCode() != 200) {
-				System.err.println("Unable to upload descriptor for device " + uuid + ", request failed: " + response.getStatusLine());
-				response.close();
-				System.exit(1);
-			}
-			String responseBody = EntityUtils.toString(response.getEntity());
-			response.close();
-			
-		} catch (IOException ex) {
-			ex.printStackTrace(System.err);
-			System.exit(1);
-		}
-        
-	}
-	
     // ************* private methods (Lamp related) ***************
 	private void callWebService_available(String payload) {
 		try {
-			URL hueColorService = new URL(
-					"http://192.168.0.111/api/newdeveloper/lights/4/state");
+			URL hueColorService = new URL("http://192.168.0.111/api/newdeveloper/lights/4/state");
 			HttpURLConnection conn = (HttpURLConnection) hueColorService.openConnection();
 			conn.setDoOutput(true);
 			conn.setRequestMethod("PUT");
@@ -368,8 +373,7 @@ public class DTable extends LhingsDevice {
 
     private void callWebService_lightOnOff(String payload) {
 		try {
-			URL hueColorService = new URL(
-                                          "http://192.168.0.111/api/newdeveloper/lights/3/state");
+			URL hueColorService = new URL("http://192.168.0.111/api/newdeveloper/lights/3/state");
 			HttpURLConnection conn = (HttpURLConnection) hueColorService.openConnection();
 			conn.setDoOutput(true);
 			conn.setRequestMethod("PUT");
@@ -396,7 +400,10 @@ public class DTable extends LhingsDevice {
 			e.printStackTrace();
 		}
 	} 
-
+    
+    // ************************************
+    // ************* MAIN *****************
+    // ************************************
 	public static void main(String[] args) {
 		@SuppressWarnings("unused")
 		// starting your device is as easy as creating an instance!!
