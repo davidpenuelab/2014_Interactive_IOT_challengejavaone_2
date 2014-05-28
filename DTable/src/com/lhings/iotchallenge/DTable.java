@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.List;
 
+import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
