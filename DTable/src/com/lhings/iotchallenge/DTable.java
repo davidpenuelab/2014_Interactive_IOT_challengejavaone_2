@@ -270,7 +270,7 @@ public class DTable extends LhingsDevice {
         System.out.println("DEVICES:"+devices.toString());
         String uuidPlugLhings = devices.get("PlugLhings");
         System.out.println("uuidPlugLhings: "+uuidPlugLhings);
-        sendMessageLhings(uuidPlugLhings, "Welcome to the Co-working space");
+        sendMessageLhings(apikey, uuidPlugLhings, "Welcome to the Co-working space");
         
     }
     
@@ -282,8 +282,10 @@ public class DTable extends LhingsDevice {
 			post.addHeader("X-Api-Key", apikey);
             post.setHeader("Content-Type", "application/json");
 
-            post.setEntity(new UrlEncodedFormEntity(new BasicNameValuePair("text", "Welcome melon!")));
-
+            List <NameValuePair> params = new ArrayList<NameValuePair>();
+            params.add(new BasicNameValuePair("text", "hello melon!"));
+            
+            post.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));
 			CloseableHttpResponse response = httpclient.execute(post);
 			if (response.getStatusLine().getStatusCode() != 200) {
 				System.err.println("Device.doAction request failed: " + response.getStatusLine());
