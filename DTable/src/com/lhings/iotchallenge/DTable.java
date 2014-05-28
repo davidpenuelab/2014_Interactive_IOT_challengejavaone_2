@@ -284,6 +284,8 @@ public class DTable extends LhingsDevice {
     
     private void sendMessageLhings(String apikey, String uuid, String message){
         try {
+            System.out.println("try same code as JOSE");
+
 			URL actionURL = new URL("https://www.lhings.com/laas/api/v1/devices/"+uuid+"/actions/viabrate");
 			HttpURLConnection conn = (HttpURLConnection) actionURL.openConnection();
 			conn.setDoOutput(true);
@@ -498,6 +500,7 @@ public class DTable extends LhingsDevice {
 	public static void main(String[] args) {
 		@SuppressWarnings("unused")
 		// starting your device is as easy as creating an instance!!
+        System.setProperty("jsse.enableSNIExtension", "false");
 		DTable table = new DTable();
 
 	}
