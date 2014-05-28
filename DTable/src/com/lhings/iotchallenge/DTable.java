@@ -285,7 +285,7 @@ public class DTable extends LhingsDevice {
     
     private void sendMessageLhings(String apikey, String uuid, String message){
         try {
-            System.out.println("try same code as JOSE");
+            System.out.println("1try same code as JOSE");
 
 			URL actionURL = new URL("https://www.lhings.com/laas/api/v1/devices/"+uuid+"/actions/viabrate");
 			HttpURLConnection conn = (HttpURLConnection) actionURL.openConnection();
@@ -293,7 +293,7 @@ public class DTable extends LhingsDevice {
 			conn.setRequestMethod("PUT");
 			conn.setRequestProperty("X-Api-Key", apikey);
 			conn.setRequestProperty("Content-Type", "application/json");
-            System.out.println("try same code as JOSE");
+            System.out.println("2");
             
             JSONArray obj_call = new JSONArray();
             
@@ -306,13 +306,13 @@ public class DTable extends LhingsDevice {
             
 //			String input = obj_call.toString();
 			String input = "[]";
-            System.out.println("try same code as JOSE");
+            System.out.println("3");
             
 			OutputStream os = conn.getOutputStream();
 			os.write(input.getBytes());
 			os.flush();
             
-            System.out.println("try same code as JOSE");
+            System.out.println("4");
 			BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
             
 			String output;
@@ -320,7 +320,7 @@ public class DTable extends LhingsDevice {
 			while ((output = br.readLine()) != null) {
 				System.out.println(output);
 			}
-            System.out.println("try same code as JOSE");
+            System.out.println("5");
 			conn.disconnect();
 		} catch (Exception e) {
                 // TODO Auto-generated catch block
