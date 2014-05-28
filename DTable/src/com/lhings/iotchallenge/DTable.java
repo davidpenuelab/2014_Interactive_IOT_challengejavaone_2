@@ -235,14 +235,14 @@ public class DTable extends LhingsDevice {
         System.out.println("checkout!");
 	}
     
-    private void getDevicesFromUser(apikey){
+    private void getDevicesFromUser(String apikey){
         System.out.print("TODO: Send Apikey of Coworking to Pereda: i send to plughlings welcome text and Pereda will do welcome in his app");
     }
-    private void sendApikeyToCoffee(apikey){
+    private void sendApikeyToCoffee(String apikey){
         System.out.println("TODO: Send Apikey of user to coffeemaker");
     }
     
-    private void sendGoodByeMessage(apikey){
+    private void sendGoodByeMessage(String apikey){
         System.out.println("TODO: Send goodby to Pereda and Lhings");
     }
 	private void setAvailable(boolean available) {
