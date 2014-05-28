@@ -213,10 +213,10 @@ public class DTable extends LhingsDevice {
 	}
     private void setLightOn(boolean value){
         if (this.on == false && value == true){
-			callWebService_lightOnOff("{\"on\":true, \"hue\":0}");
+			callWebService_lightOnOff("{\"on\":false}");
 		}
 		else if (this.on == true && value == false){
-			callWebService_lightOnOff("{\"on\":false}");
+			callWebService_lightOnOff("{\"on\":true, \"hue\":0}");
 		}
         
 		this.on = value;
