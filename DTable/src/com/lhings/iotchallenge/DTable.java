@@ -48,6 +48,8 @@ public class DTable extends LhingsDevice {
     static Thread rfid_thread;
     static RP_Rfid rfid;
     
+    private boolean on=false;
+    
 	public DTable() {
 		// Co-working space credenti
         super("david@lhings.com", "coworking", 5000, "DTable");
@@ -56,8 +58,7 @@ public class DTable extends LhingsDevice {
 
 	@Override
 	public void setup() {
-		// ensure availabity is in a known state
-		setAvailable(true);
+        //First, setup the RFID
         setupRFID();
 	
 	}
@@ -65,8 +66,9 @@ public class DTable extends LhingsDevice {
 	@Override
 	public void loop() {
 		try {
+            //Since we created a thread for the RFID, we check if the credentials are corret/not null in the update
             updateRfid();
-
+            //give just a bit of time to breath
 			Thread.sleep(50);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -75,6 +77,7 @@ public class DTable extends LhingsDevice {
 	}
 
     private void setupRFID() {
+        //Created a thread so its not blocking the app the RFID
 		rfid = new RP_Rfid();
 		rfid_thread = new Thread(rfid,"RFID Table");
 		rfid_thread.start();
@@ -94,6 +97,9 @@ public class DTable extends LhingsDevice {
                 userApikey = apikey;
                 checkIn= true;
                 sendCheckedIn = true;
+                // we set up the AVAILABLE to true since we just checked in and we show co-workers that are Available
+                setAvailable(true);
+                toogleLight();
             }else{
                 if(userApikey.equals(apikey)){
                     doCheckout();
@@ -112,8 +118,9 @@ public class DTable extends LhingsDevice {
 
 
     
-	// todos los eventos funcionan igual, si en alguna parte del código se pone la
-	// variable checkedIn (la que toque en cada caso) a true el evento se envía una vez
+    // ************************************
+    // ************* EVENTS ***************
+    // ************************************
 	@Event(name="CheckedIn")
 	public String checkedIn(){
 		if (sendCheckedIn){
@@ -159,128 +166,105 @@ public class DTable extends LhingsDevice {
 			return null;
 	}
 
-
+    // ************************************
+    // ************* STATUS ***************
+    // ************************************
     @Stats(name ="checkedIn", type="boolean")
     public boolean isCheckedIn(){
         return checkIn;
     }
-	@Stats(name = "user", type = "string")
-	public String getUser(){
-		if (user == null)
-			return "no user";
-		else
-			return user;
-	}
 
-	@Stats(name = "available", type = "boolean")
+	@Stats(name = "availability", type = "boolean")
 	public boolean isAvailable(){
 		return available;
 	}
 	
-	
+	@Stats(name = "light", type = "boolean")
+	public boolean lightStatus(){
+		return on;
+	}
 
-	// ************* private methods (Lamp related) ***************
+	// ************************************
+    // ************* ACTIONS **************
+    // ************************************
 
-	// llamar este método para cambiar entre available y notAvailable
-	// cada vez que se llame la bombilla hue1 debería ponerse roja
-	// y apagada alternativamente (estoy ya está implementado, todavía no
-	// probado. si no funcionase, ver el código en DLamp.java, que hace
-	// exactamente lo mismo con la bombilla 4. si es necesario
-	// ver api de hue en http://developers.meethue.com/1_lightsapi.html)
+    @Action (name = "toggleAvailabe", description = "Toggle between green/red light of availability of user", argumentNames = {}, argumentTypes = {})
 	private void toggleAvailable(){
 		setAvailable(!available);
     
     }
 
-	// esto de momento es dummy, que incluya aquí sergi un ejemplo de llamada a
-	// web service del taxi
+    @Action (name = "requestTaxi", description = "Requests a taxi", argumentNames = {}, argumentTypes = {})
 	private void requestTaxi(){
-        System.out.println("Request a Taxi!");
+        System.out.println("TODO: Request a Taxi!");
 	}
 
+    @Action (name = "toggleLight", description = "Toggle light on/off ", argumentNames = {}, argumentTypes = {})
+    private void toogleLight (){
+        setLightOn(!on);
+      
+    }
+    
 	private void doCheckin(String apikey){
-        
-        Map<String, String> devices = getAllDevicesInAccount(apikey);
-		// check if device Lamp exists in account with apikey, create if not (descriptor will be uploaded by the device itself)
-		if (devices.get("Lamp")==null){
-			String uuid = createDevice(apikey, "Lamp");
-			devices.put("Lamp", uuid);
-		}
-		
-		// check if device CoffeeMaker exists in account with apikey, create if not and upload descriptor
-		if (devices.get("CoffeeMaker")== null){
-			String uuid = createDevice(apikey, "CoffeeMaker");
-			devices.put("CoffeeMaker", uuid);
-			String descriptor = "{\r\n    \"modelName\": \"Nespresso\",\r\n    \"manufacturer\": \"DeLonghi\",\r\n    \"deviceType\": \"CoffeeMaker\",\r\n    \"serialNumber\": \"SN04732\",\r\n    \"friendlyName\": \"CoffeeMaker\",\r\n    \"uuid\": \"13dfc9c7-f8f2-4cd0-9472-89c1b179144f\",\r\n    \"version\": 1,\r\n    \"stateVariableList\": [],\r\n    \"actionList\": [],\r\n    \"eventList\": [\r\n        {\r\n            \"name\": \"CheckedIn\"\r\n        }\r\n    ]\r\n}";
-			uploadDescriptor(apikey, uuid, descriptor);
-		}
-		
-		// check if device Table exists in account with apikey, create if not (descriptor will be uploaded by the device itself)
-		if (devices.get("Table")== null){
-			String uuid = createDevice(apikey, "Table");
-			devices.put("CoffeeMaker", uuid);
-		}
-		
-		// Start device lamp
-		// first create device.properties file for it
-		Properties props = new Properties();
-		props.setProperty("apikey", apikey);
-		props.setProperty("port", "5001");
-		props.setProperty("name", "Lamp");
-		try {
-			props.store(new FileOutputStream("../DLamp/device.properties"), "");
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		// now device is ready to start
-		 try {
-			Process p = Runtime.getRuntime().exec("../DLamp/DLamp.sh"); // para apagarla se hace mediante el acción shutdown de DLamp
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		// se hace lo mismo con DTable, se crea otro dispositivo y se arranca de forma análoga a como 
-		// hemos hecho con DLamp
-
-        Properties props2 = new Properties();
-		props2.setProperty("apikey", apikey);
-		props2.setProperty("port", "5003");
-		props2.setProperty("name", "DTableU");
-		try {
-			props2.store(new FileOutputStream("../DTableU/device.properties"), "");
-		} catch (FileNotFoundException e) {
-                // TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-                // TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-            // now device is ready to start
-        try {
-			Process p2 = Runtime.getRuntime().exec("../DTableU/DTableU.sh"); // para apagarla se hace mediante el acción shutdown de DTableU
-		} catch (IOException e) {
-                // TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        
-		// se utiliza el servicio Device.startSession para poner online DCoffeMakerU
-		// se utiliza el servicio Device.doAction para llamar a la acción allowUser the DCoffeeMakerC (https://github.com/lhings/documentation/wiki/Device-dot-doAction )
-		// pasándole el apikey del usuario
-        
+        sendApikeyToCoffee(apikey);
+        setLightOn(true);
+        setAvailable(true);
+        getDevicesFromUser(apikey);//and send welcome, send to desktop app apikey
         System.out.println("Checked in done with apikey+"+apikey);
 	}
-
-	private void doCheckout(){
+    private void setLightOn(boolean value){
+        if (this.on == false && value == true){
+			callWebService_lightOnOff("{\"on\":true, \"hue\":0}");
+		}
+		else if (this.on == true && value == false){
+			callWebService_lightOnOff("{\"on\":false}");
+		}
+        
+		this.on = value;
+        
+        if(this.on)
+            System.out.println("Light ON");
+        else
+            System.out.println("Light OFF");
+    }
+    
+	private void doCheckout(String apikey){
 		// llamamos al shutdown de DTable y DLamp para terminarlos, ponemos offline DCoffeeMakerU
 		// se utiliza el servicio Device.endSession para poner offline DCoffeMakerU
+        sendGoodByeMessage(apikey);
         System.out.println("checkout!");
 	}
+    
+    private void getDevicesFromUser(apikey){
+        System.out.print("TODO: Send Apikey of Coworking to Pereda: i send to plughlings welcome text and Pereda will do welcome in his app");
+    }
+    private void sendApikeyToCoffee(apikey){
+        System.out.println("TODO: Send Apikey of user to coffeemaker");
+    }
+    
+    private void sendGoodByeMessage(apikey){
+        System.out.println("TODO: Send goodby to Pereda and Lhings");
+    }
+	private void setAvailable(boolean available) {
+		
+		if (this.available == false && available == true){
+			callWebService("{\"on\":true, \"hue\":25000}");//green {"on":true, "hue": 25000}
+			sendAvailable = true;
+		}
+		else if (this.available == true && available == false){
+			callWebService("{\"on\":true, \"hue\":1000}");//red {"on":true, "hue": 1000}
+			sendNotAvailable = true;
+		}
+			
 
+		this.available = available;
+        
+        if(this.available)
+            System.out.println("I am Available right now");
+        else
+            System.out.println("I am NOT Available right now");
+	}
+    
 	private void uploadDescriptor(String apikey, String uuid, String descriptor){
 		try {
 			CloseableHttpClient httpclient = HttpClients.createDefault();
@@ -301,11 +285,11 @@ public class DTable extends LhingsDevice {
 			ex.printStackTrace(System.err);
 			System.exit(1);
 		}
-
+        
 	}
 	
 	private String createDevice(String apikey, String devName){
-		//register device 
+            //register device
 		try {
 			CloseableHttpClient httpclient = HttpClients.createDefault();
 			HttpPost post = new HttpPost("https://www.lhings.com/laas/api/v1/devices/");
@@ -333,31 +317,12 @@ public class DTable extends LhingsDevice {
 		return null;
 	}
 
-	private void setAvailable(boolean available) {
-		
-		if (this.available == false && available == true){
-			callWebService("{\"on\":false}");
-			sendAvailable = true;
-		}
-		else if (this.available == true && available == false){
-			callWebService("{\"on\":true, \"hue\":0}");
-			sendNotAvailable = true;
-		}
-			
-
-		this.available = available;
-        
-        if(this.available)
-            System.out.println("I am Available right now");
-        else
-            System.out.println("I am NOT Available right now");
-	}
-
-	private void callWebService(String payload) {
+        // ************* private methods (Lamp related) ***************
+	private void callWebService_available(String payload) {
 		
 		try {
 			URL hueColorService = new URL(
-					"http://192.168.1.129/api/jfokususer/lights/1/state");
+					"http://192.168.0.111/api/newdeveloper/lights/4/state");
 			HttpURLConnection conn = (HttpURLConnection) hueColorService.openConnection();
 			conn.setDoOutput(true);
 			conn.setRequestMethod("PUT");
@@ -385,20 +350,37 @@ public class DTable extends LhingsDevice {
 		}
 	} 
 
-	private float temperatureToPercentage(float x) {
-		float in_min=30;
-		float in_max=45;
-		float out_min=0;
-		float out_max=100;
+    private void callWebService_lightOnOff(String payload) {
 		
-		if (x<in_min)
-			return out_min;
-		if (x>in_max)
-			return out_max;
-		
-		return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-	}
-
+		try {
+			URL hueColorService = new URL(
+                                          "http://192.168.0.111/api/newdeveloper/lights/3/state");
+			HttpURLConnection conn = (HttpURLConnection) hueColorService.openConnection();
+			conn.setDoOutput(true);
+			conn.setRequestMethod("PUT");
+			conn.setRequestProperty("Content-Type", "application/json");
+            
+			String input = payload;
+            
+			OutputStream os = conn.getOutputStream();
+			os.write(input.getBytes());
+			os.flush();
+            
+			BufferedReader br = new BufferedReader(new InputStreamReader(
+                                                                         (conn.getInputStream())));
+            
+			String output;
+			System.out.println("Output from Server .... \n");
+			while ((output = br.readLine()) != null) {
+				System.out.println(output);
+			}
+            
+			conn.disconnect();
+		} catch (Exception e) {
+                // TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	} 
 
 	public static void main(String[] args) {
 		@SuppressWarnings("unused")
