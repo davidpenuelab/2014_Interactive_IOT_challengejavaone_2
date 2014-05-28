@@ -267,7 +267,7 @@ public class DTable extends LhingsDevice {
     private void getDevicesFromUser(String apikey){
         System.out.print("TODO: Send Apikey of Coworking to Pereda: i send to plughlings welcome text and Pereda will do welcome in his app");
         devices = getAllDevicesInAccount(apikey);
-        System.out.println(devices.toString());
+        System.out.println("DEVICES:"+devices.toString());
     }
     
     private void sendApikeyToCoffee(String apikey){
