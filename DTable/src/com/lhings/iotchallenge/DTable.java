@@ -290,7 +290,8 @@ public class DTable extends LhingsDevice {
 			post.addHeader("X-Api-Key", apikey);
             post.setHeader("Content-Type", "application/json");
 
-            String toSend = "{\r\n    \"name\": \"text\",\r\n    \"value\": \"hello melon test\"}";
+//            String toSend = "{\"name\": \"text\",\r\n    \"value\": \"hello melon test\"}";
+            String toSend = "{ \"name\": \"text\", \"value\": \"hello test\"}";
             StringEntity requestBody = new StringEntity(toSend);
             post.setEntity(requestBody);
             CloseableHttpResponse response = httpclient.execute(post);
