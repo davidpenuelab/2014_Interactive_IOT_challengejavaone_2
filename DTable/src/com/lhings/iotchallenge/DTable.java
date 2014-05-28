@@ -292,7 +292,18 @@ public class DTable extends LhingsDevice {
             post.setHeader("Accept", "application/json");
 
 //            String toSend = "{\"name\": \"text\",\r\n    \"value\": \"hello melon test\"}";
-            StringEntity requestBody = new StringEntity("{\"name\":\"text\",\"value\":\"hello test\"}");
+            JSONArray obj_call = new JSONArray();
+            
+            JSONObject obj1 = new JSONObject();
+            obj1.put("name","text");
+            obj_call.put(obj1);
+            JSONObject obj2 = new JSONObject();
+            obj2.put("value","Hello test melon");
+            obj_call.put(obj2);
+            
+            String toSend = obj_call.toString();
+            
+            StringEntity requestBody = new StringEntity(toSend);
             post.setEntity(requestBody);
             CloseableHttpResponse response = httpclient.execute(post);
             if (response.getStatusLine().getStatusCode() != 200) {
