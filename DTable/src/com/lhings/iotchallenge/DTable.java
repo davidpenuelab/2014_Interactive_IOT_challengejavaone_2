@@ -7,13 +7,18 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.URISyntaxException;
+
 import java.net.URL;
+import java.net.URI;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.List;
 import java.util.ArrayList;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.NameValuePair;
