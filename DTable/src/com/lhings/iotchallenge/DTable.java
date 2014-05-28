@@ -127,53 +127,53 @@ public class DTable extends LhingsDevice {
 
 
     
-    // ************************************
-    // ************* EVENTS ***************
-    // ************************************
-	@Event(name="CheckedIn")
-	public String checkedIn(){
-		if (sendCheckedIn){
-			sendCheckedIn = false;
-			return userApikey;
-		} else
-			return null;
-	}
-
-	@Event(name="CheckedOut")
-	public String checkedOut(){
-		if (sendCheckedOut){
-			sendCheckedOut = false;
-			return "checkout";
-		} else
-			return null;
-	}
-
-	@Event(name="TaxiRequested")
-	public String taxiRequested(){
-		if (sendTaxiRequested){
-			sendTaxiRequested = false;
-			return "";
-		} else
-			return null;
-	}
-
-	@Event(name="Available")
-	public String available(){
-		if (sendAvailable){
-			sendAvailable = false;
-			return "";
-		} else
-			return null;
-	}
-
-	@Event(name="NotAvailable")
-	public String notAvailable(){
-		if (sendNotAvailable){
-			sendNotAvailable = false;
-			return "";
-		} else
-			return null;
-	}
+//    // ************************************
+//    // ************* EVENTS ***************
+//    // ************************************
+//	@Event(name="CheckedIn")
+//	public String checkedIn(){
+//		if (sendCheckedIn){
+//			sendCheckedIn = false;
+//			return userApikey;
+//		} else
+//			return null;
+//	}
+//
+//	@Event(name="CheckedOut")
+//	public String checkedOut(){
+//		if (sendCheckedOut){
+//			sendCheckedOut = false;
+//			return "checkout";
+//		} else
+//			return null;
+//	}
+//
+//	@Event(name="TaxiRequested")
+//	public String taxiRequested(){
+//		if (sendTaxiRequested){
+//			sendTaxiRequested = false;
+//			return "";
+//		} else
+//			return null;
+//	}
+//
+//	@Event(name="Available")
+//	public String available(){
+//		if (sendAvailable){
+//			sendAvailable = false;
+//			return "";
+//		} else
+//			return null;
+//	}
+//
+//	@Event(name="NotAvailable")
+//	public String notAvailable(){
+//		if (sendNotAvailable){
+//			sendNotAvailable = false;
+//			return "";
+//		} else
+//			return null;
+//	}
 
     // ************************************
     // ************* STATUS ***************
