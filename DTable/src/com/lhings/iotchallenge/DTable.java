@@ -304,7 +304,6 @@ public class DTable extends LhingsDevice {
             
         } catch (IOException ex) {
             ex.printStackTrace(System.err);
-            System.exit(1);
         }
 
         /*
