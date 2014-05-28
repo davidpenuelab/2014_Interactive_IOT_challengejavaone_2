@@ -188,7 +188,7 @@ public class DTable extends LhingsDevice {
     // ************* ACTIONS **************
     // ************************************
 
-    @Action (name = "toggleAvailabe", description = "Toggle between green/red light of availability of user", argumentNames = {}, argumentTypes = {})
+    @Action (name = "toggleAvailable", description = "Toggle between green/red light of availability of user", argumentNames = {}, argumentTypes = {})
 	private void toggleAvailable(){
 		setAvailable(!available);
     
@@ -200,9 +200,8 @@ public class DTable extends LhingsDevice {
 	}
 
     @Action (name = "toggleLight", description = "Toggle light on/off ", argumentNames = {}, argumentTypes = {})
-    private void toogleLight (){
+    private void toggleLight(){
         setLightOn(!on);
-      
     }
     
 	private void doCheckin(String apikey){
@@ -248,11 +247,11 @@ public class DTable extends LhingsDevice {
 	private void setAvailable(boolean available) {
 		
 		if (this.available == false && available == true){
-			callWebService("{\"on\":true, \"hue\":25000}");//green {"on":true, "hue": 25000}
+			callWebService_available("{\"on\":true, \"hue\":25000}");//green {"on":true, "hue": 25000}
 			sendAvailable = true;
 		}
 		else if (this.available == true && available == false){
-			callWebService("{\"on\":true, \"hue\":1000}");//red {"on":true, "hue": 1000}
+			callWebService_available("{\"on\":true, \"hue\":1000}");//red {"on":true, "hue": 1000}
 			sendNotAvailable = true;
 		}
 			
