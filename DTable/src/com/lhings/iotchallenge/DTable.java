@@ -189,17 +189,16 @@ public class DTable extends LhingsDevice {
     // ************************************
 
     @Action (name = "toggleAvailable", description = "Toggle between green/red light of availability of user", argumentNames = {}, argumentTypes = {})
-	private void toggleAvailable(){
+	public void toggleAvailable(){
 		setAvailable(!available);
-    
     }
 
     @Action (name = "toggleLight", description = "Toggle light on/off ", argumentNames = {}, argumentTypes = {})
-    private void toggleLight(){
+    public void toggleLight(){
         setLightOn(!on);
     }
     @Action (name = "requestTaxi", description = "Requests a taxi", argumentNames = {}, argumentTypes = {})
-	private void requestTaxi(){
+	public void requestTaxi(){
         System.out.println("TODO: Request a Taxi!");
 	}
 
