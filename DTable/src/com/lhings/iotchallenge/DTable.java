@@ -286,26 +286,49 @@ public class DTable extends LhingsDevice {
         
 		try {
 			CloseableHttpClient httpclient = HttpClients.createDefault();
-			HttpPost post = new HttpPost("https://www.lhings.com/laas/api/v1/devices/"+uuid+"/actions/notification");
+			HttpPost post = new HttpPost("https://www.lhings.com/laas/api/v1/devices/"+uuid+"/actions/notifications");
 			post.addHeader("X-Api-Key", apikey);
 //            post.setHeader("Content-Type", "application/json");
 
-            StringEntity entity = new StringEntity("{'name': 'text', 'value': 'Hola melon! como estas?'}");
-            entity.setContentType("application/json");
-            post.setEntity(entity);
+            String toSend = "{\r\n    \"name\": \"text\",\r\n    \"value\": \"hello melon test\"}";
+            StringEntity requestBody = new StringEntity(toSend);
+            post.setEntity(requestBody);
+            CloseableHttpResponse response = httpclient.execute(post);
+            if (response.getStatusLine().getStatusCode() != 200) {
+                System.err.println("Unable do action for device " + uuid + ", request failed: " + response.getStatusLine());
+                response.close();
+                System.exit(1);
+            }
+            String responseBody = EntityUtils.toString(response.getEntity());
+            response.close();
             
-			CloseableHttpResponse response = httpclient.execute(post);
-			if (response.getStatusLine().getStatusCode() != 200) {
-				System.err.println("Device.doAction request failed: " + response.getStatusLine());
-				response.close();
-				System.exit(1);
-			}
-			String responseBody = EntityUtils.toString(response.getEntity());
-			response.close();
-			
-		} catch (IOException ex) {
-			ex.printStackTrace(System.err);
-		}
+        } catch (IOException ex) {
+            ex.printStackTrace(System.err);
+            System.exit(1);
+        }
+
+        /*
+         try {
+         CloseableHttpClient httpclient = HttpClients.createDefault();
+         HttpPost post = new HttpPost("https://www.lhings.com/laas/api/v1/devices/" + uuid + "/");
+         post.addHeader("X-Api-Key", apikey);
+         StringEntity requestBody = new StringEntity(descriptor);
+         post.setEntity(requestBody);
+         CloseableHttpResponse response = httpclient.execute(post);
+         if (response.getStatusLine().getStatusCode() != 200) {
+         System.err.println("Unable to upload descriptor for device " + uuid + ", request failed: " + response.getStatusLine());
+         response.close();
+         System.exit(1);
+         }
+         String responseBody = EntityUtils.toString(response.getEntity());
+         response.close();
+         
+         } catch (IOException ex) {
+         ex.printStackTrace(System.err);
+         System.exit(1);
+         }
+
+         */
     }
 
     private void sendApikeyToCoffee(String apikey){
