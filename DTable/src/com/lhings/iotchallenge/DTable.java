@@ -22,9 +22,12 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.lhings.library.Action;
+import com.lhings.library.Stats;
 import com.lhings.library.Event;
 import com.lhings.library.LhingsDevice;
-import com.lhings.library.Stats;
+import com.lhings.library.Payload;
+
 
 public class DTable extends LhingsDevice {
 	
@@ -102,7 +105,7 @@ public class DTable extends LhingsDevice {
                 toogleLight();
             }else{
                 if(userApikey.equals(apikey)){
-                    doCheckout();
+                    doCheckout(apikey);
                     checkIn = false;
                     sendCheckedOut= true;
                 }else if (apikey.equals(taxiCardKey)){
