@@ -124,13 +124,10 @@ public class DTable extends LhingsDevice {
                     doCheckout(apikey);
                     checkIn = false;
                     sendCheckedOut= true;
-                    webService_sendCheckStatus(apikey);
                 }else if (apikey.equals(taxiCardKey)){
                     requestTaxi();
-                    webService_sendCheckStatus(apikey);
                 }else if(apikey.equals(availableCardKey)){
                     toggleAvailable();
-                    webService_sendCheckStatus(apikey);
                 }
             
             }
