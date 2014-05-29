@@ -183,6 +183,8 @@ public class DTable extends LhingsDevice {
         setAvailable(true);
         getDevicesFromUser(apikey);//and send welcome, send to desktop app apikey
         getDevicesFromCoworking(apikey);
+        System.out.println("DEVICES USER: "+devicesUser.toString());
+        System.out.println("DEVICES COWORKING: "+devicesCoworking.toString());
 	}
     
     private void doCheckout(String apikey){
