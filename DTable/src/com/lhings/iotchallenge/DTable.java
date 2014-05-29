@@ -329,9 +329,9 @@ public class DTable extends LhingsDevice {
                 if(httpClient!=null){
                     httpClient.close();
                 }
-            }catch(IOException ex) {}
-
-            System.out.println("Finally Error "+ex.toString());
+            }catch(IOException ex) {
+                System.out.println("Finally Error "+ex.toString());
+            }
         }
     }
 
