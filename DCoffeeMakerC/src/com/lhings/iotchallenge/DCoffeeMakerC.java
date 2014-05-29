@@ -165,7 +165,7 @@ public class DCoffeeMakerC extends LhingsDevice {
 		CloseableHttpClient httpClient=null;
         CloseableHttpResponse response=null;
         try {
-            
+            String message = "You have 5 minutes to make a coffee, enjoy!";
             httpClient = HttpClients.createDefault();
             URI uri = new URI("https://www.lhings.com/laas/api/v1/devices/"+uuid+"/actions/notifications");
             HttpPost httpPost = new HttpPost(uri);
