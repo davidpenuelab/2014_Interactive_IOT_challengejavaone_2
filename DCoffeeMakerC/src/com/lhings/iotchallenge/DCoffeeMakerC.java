@@ -73,13 +73,20 @@ public class DCoffeeMakerC extends LhingsDevice {
 	private boolean eventSent = false;
     Map<String,String> devices;
     
+    
+    // ************************************
+    // ************* CONSTRUCTOR **********
+    // ************************************
 	public DCoffeeMakerC() {
 		// substituir credenciales con las del coworking antes de enviar a JavaOne
  	   	super("david@lhings.com", "coworking", 5000, "CoffeeMaker");
 		System.setProperty("jsse.enableSNIExtension", "false");
 
 	}
-
+    
+    // ************************************
+    // ************* LHINGS LOOP+UPDATE ***
+    // ************************************
 	@Override
 	public void setup() {
 		setupTrigger();
@@ -109,15 +116,16 @@ public class DCoffeeMakerC extends LhingsDevice {
 
 	}
 
+    // ************************************
+    // ************* RFID *****************
+    // ************************************
     private void setupRFID() {
 		rfid = new RP_Rfid();
 		rfid_thread = new Thread(rfid,"RFID Table");
 		rfid_thread.start();
 	}
 	
-	public void setupTrigger(){
-		trig = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_04, "trigger", PinState.LOW);
-    }
+	public void setupTrigger(){ trig = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_04, "trigger", PinState.LOW); }
     
 	private void updateRfid() throws IOException{
 		String apikey = rfid.getStringApiKey();
@@ -135,21 +143,72 @@ public class DCoffeeMakerC extends LhingsDevice {
     public void updateTrigger() throws InterruptedException{
 	   	if(System.currentTimeMillis()-lastTimeChecked<minutesForCoffe){
 	   		enablePower = true;
-			if(!eventSent){
-				eventSent = true;
-			}
-			
-			
+			if(!eventSent){ eventSent = true; }
 	   	}else{
 	   		enablePower = false;
 			eventSent = false;
 	   	}
-	   	if(enablePower){
-		   	trig.high();
-	   	}else{
-		   	trig.low();
-	   	}
+	   	if(enablePower){trig.high();}
+        else{ trig.low(); }
     }
+
+    // ************************************
+    // ************* ACTIONS **************
+    // ************************************
+
+	@Action(name = "AllowUser", description = "", argumentNames = {"apikey"}, argumentTypes = {"String"})
+	public void allowUser(String payload) {
+		storeApiKey(payload);
+		System.out.println("Successfully stored apikey " + payload);
+	}
+
+    // ************************************
+    // ************* OTHER METHODS ********
+    // ************************************
+
+	private void storeApiKey(String apikey){
+		HashSet<String> list = getAuthList();
+		list.add(apikey);
+		writeAuthList(list);
+	}
+
+	private boolean isAllowed(String apikey){ return getAuthList().contains(apikey);}
+
+	private HashSet<String> getAuthList(){
+		final String filename = "authUsers.list";
+		try {
+			File f = new File(filename);
+			// check if file exists, create it if not
+			if (!f.exists()){
+				ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filename));
+				oos.writeObject(new HashSet<String>());
+				oos.close();
+			}
+			
+			// read list of authorized api keys
+			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filename));
+			HashSet<String> apikeyList = (HashSet<String>) ois.readObject();
+			ois.close();
+			return apikeyList;
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+			System.exit(1);
+		}
+		return null;
+	}
+
+	private void writeAuthList(HashSet<String> apikeyList){
+		final String filename = "authUsers.list";
+		try{
+			// add new api key and write again to file
+			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filename));
+			oos.writeObject(apikeyList);
+			oos.close();
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+			System.exit(1);
+		}
+	}
 
     private void sendEventCoffeeMade(String apikey)throws IOException{
         devices = getAllDevicesInAccount(apikey);
@@ -158,7 +217,44 @@ public class DCoffeeMakerC extends LhingsDevice {
         sendNotificationToDesktopApp(apikey);
     }
 
-	private void sendNotificationToPlugLhings(String apikey) throws IOException{
+    // ************************************
+    // ************* WEBSERVICES **********
+    // ************************************
+	private Map<String,String> getAllDevicesInAccount(String apikey) {
+		System.out.println("I will try to list all the devices in"+apikey);
+		try {
+			CloseableHttpClient httpclient = HttpClients.createDefault();
+			HttpGet get = new HttpGet("https://www.lhings.com/laas/api/v1/devices/");
+            get.addHeader("User-Agent", "Mozilla/5.0");
+			get.addHeader("X-Api-Key", apikey);
+
+			CloseableHttpResponse response = httpclient.execute(get);
+			if (response.getStatusLine().getStatusCode() != 200) {
+				System.err.println("Device.list request failed: " + response.getStatusLine());
+				response.close();
+				System.exit(1);
+			}
+			String responseBody = EntityUtils.toString(response.getEntity());
+			response.close();
+			JSONArray listDevices = new JSONArray(responseBody);
+			int numElements = listDevices.length();
+			Map<String,String> results = new HashMap<String, String>();
+			for (int i = 0; i<numElements; i++){
+				JSONObject device = listDevices.getJSONObject(i);
+				String uuid = device.getString("uuid");
+				String name = device.getString("name");
+				results.put(name, uuid);
+			}
+			
+			return results;
+		} catch (IOException ex) {
+			ex.printStackTrace(System.err);
+			System.exit(1);
+		}
+		return null;
+	}
+    
+    private void sendNotificationToPlugLhings(String apikey) throws IOException{
         System.out.println("I will try to send an Event in Account: "+apikey);
 		String uuid = devices.get("PlugLhings");
             //sent to Pereda event
@@ -204,163 +300,14 @@ public class DCoffeeMakerC extends LhingsDevice {
         System.out.println("Notification to PlugLhings sent correctly");
 	}
     
-    private void sendNotificationToDesktopApp(String apikey) throws IOException{
-//        System.out.println("TODO: send action to Pereda of RequestedCoffee "+apikey);
-//		String uuid = devices.get("Interface");
-//            //sent to Pereda event
-//		CloseableHttpClient httpClient=null;
-//        CloseableHttpResponse response=null;
-//        try {
-//            
-//            httpClient = HttpClients.createDefault();
-//            URI uri = new URI("https://www.lhings.com/laas/api/v1/devices/"+uuid+"/actions/requestCoffee");
-//            HttpPost httpPost = new HttpPost(uri);
-//            
-//            httpPost.setHeader("X-Api-Key", apikey);
-//            httpPost.setHeader("Accept", "application/json");
-//            httpPost.setHeader("Content-type", "application/json");
-//            String json="[{ \"name\": \"apikey\", \"value\": \""+apikey+"\"}]";
-//            HttpEntity postBody = new StringEntity(json);
-//            httpPost.setEntity(postBody);
-//            
-//            response = httpClient.execute(httpPost);
-//            
-//            if (response.getStatusLine().getStatusCode() != 200) {
-//                System.out.println("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
-//                return;
-//            }
-//            
-//            BufferedReader br = new BufferedReader(new InputStreamReader(
-//                                                                         (response.getEntity().getContent())));
-//            
-//            String output;
-//            System.out.println("Output from Server .... \n");
-//            while ((output = br.readLine()) != null) {
-//                System.out.println(output);
-//            }
-//        } catch (IOException | URISyntaxException e) {
-//            System.out.println("Error "+e.toString());
-//        } finally {
-//            try{
-//                if(response!=null){
-//                    response.close();
-//                }
-//                if(httpClient!=null){
-//                    httpClient.close();
-//                }
-//            }catch(IOException ex) {
-//                System.out.println("Finally Error "+ex.toString());
-//            }
-//        }
-		
+    // ************************************
+    // ************* MAIN *****************
+    // ************************************
+    public static void main(String[] args) {
+		@SuppressWarnings("unused")
+            // starting your device is as easy as creating an instance!!
+		DCoffeeMakerC coffeeMaker = new DCoffeeMakerC();
         
 	}
-	
-
-    // *********** Actions, Events and Status of DCoffeeMakerC *********************
-	
-	@Stats(name = "On", type = "boolean")
-	public boolean isOn(){
-		return on;
-	}
-
-	// *********** LAMP CONTROL *********************
-	@Action(name = "AllowUser", description = "", argumentNames = {"apikey"}, argumentTypes = {"String"})
-	public void allowUser(String payload) {
-		storeApiKey(payload);
-		System.out.println("Successfully stored apikey " + payload);
-	}
-
-	
-
-
-	public static void main(String[] args) {
-		@SuppressWarnings("unused")
-		// starting your device is as easy as creating an instance!!
-		DCoffeeMakerC coffeeMaker = new DCoffeeMakerC();
-
-	}
-
-	// ***************** private methods ************************
-	private void storeApiKey(String apikey){
-		HashSet<String> list = getAuthList();
-		list.add(apikey);
-		writeAuthList(list);
-	}
-
-	private boolean isAllowed(String apikey){
-		return getAuthList().contains(apikey);
-	}
-
-	private HashSet<String> getAuthList(){
-		final String filename = "authUsers.list";
-		try {
-			File f = new File(filename);
-			// check if file exists, create it if not
-			if (!f.exists()){
-				ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filename));
-				oos.writeObject(new HashSet<String>());
-				oos.close();
-			}
-			
-			// read list of authorized api keys
-			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filename));
-			HashSet<String> apikeyList = (HashSet<String>) ois.readObject();
-			ois.close();
-			return apikeyList;
-		} catch (Exception e) {
-			System.err.println(e.getMessage());
-			System.exit(1);
-		}
-		return null;
-	}
-
-	private void writeAuthList(HashSet<String> apikeyList){
-		final String filename = "authUsers.list";
-		try{
-			// add new api key and write again to file
-			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filename));
-			oos.writeObject(apikeyList);
-			oos.close();
-		} catch (Exception e) {
-			System.err.println(e.getMessage());
-			System.exit(1);
-		}
-	}
-
-
-	private Map<String,String> getAllDevicesInAccount(String apikey) {
-		System.out.println("I will try to list all the devices in"+apikey);
-		try {
-			CloseableHttpClient httpclient = HttpClients.createDefault();
-			HttpGet get = new HttpGet("https://www.lhings.com/laas/api/v1/devices/");
-            get.addHeader("User-Agent", "Mozilla/5.0");
-			get.addHeader("X-Api-Key", apikey);
-
-			CloseableHttpResponse response = httpclient.execute(get);
-			if (response.getStatusLine().getStatusCode() != 200) {
-				System.err.println("Device.list request failed: " + response.getStatusLine());
-				response.close();
-				System.exit(1);
-			}
-			String responseBody = EntityUtils.toString(response.getEntity());
-			response.close();
-			JSONArray listDevices = new JSONArray(responseBody);
-			int numElements = listDevices.length();
-			Map<String,String> results = new HashMap<String, String>();
-			for (int i = 0; i<numElements; i++){
-				JSONObject device = listDevices.getJSONObject(i);
-				String uuid = device.getString("uuid");
-				String name = device.getString("name");
-				results.put(name, uuid);
-			}
-			
-			return results;
-		} catch (IOException ex) {
-			ex.printStackTrace(System.err);
-			System.exit(1);
-		}
-		return null;
-	} 
 
 }

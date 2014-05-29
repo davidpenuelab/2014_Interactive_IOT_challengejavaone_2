@@ -253,9 +253,6 @@ public class DTable extends LhingsDevice {
         
     }
 
-    /*
-     TODO: send message to pereda goodbye
-     */
 	private Map<String,String> getAllDevicesInAccount(String apikey) {
 
 		try {
