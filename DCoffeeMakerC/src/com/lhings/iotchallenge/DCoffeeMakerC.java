@@ -187,11 +187,6 @@ public class DCoffeeMakerC extends LhingsDevice {
             BufferedReader br = new BufferedReader(new InputStreamReader(
                                                                          (response.getEntity().getContent())));
             
-            String output;
-            System.out.println("Output from Server .... \n");
-            while ((output = br.readLine()) != null) {
-                System.out.println(output);
-            }
         } catch (IOException | URISyntaxException e) {
             System.out.println("Error "+e.toString());
         } finally {
@@ -209,7 +204,7 @@ public class DCoffeeMakerC extends LhingsDevice {
 	}
     
     private void sendNotificationToDesktopApp(String apikey) throws IOException{
-        System.out.println("TODO: I will try trigger action in Account: "+apikey);
+        System.out.println("TODO: send action to Pereda of RequestedCoffee "+apikey);
 //		String uuid = devices.get("Interface");
 //            //sent to Pereda event
 //		CloseableHttpClient httpClient=null;
@@ -223,7 +218,7 @@ public class DCoffeeMakerC extends LhingsDevice {
 //            httpPost.setHeader("X-Api-Key", apikey);
 //            httpPost.setHeader("Accept", "application/json");
 //            httpPost.setHeader("Content-type", "application/json");
-//            String json="[{ \"name\": \"api\", \"value\": \""+apikey+"\"}]";
+//            String json="[{ \"name\": \"apikey\", \"value\": \""+apikey+"\"}]";
 //            HttpEntity postBody = new StringEntity(json);
 //            httpPost.setEntity(postBody);
 //            
