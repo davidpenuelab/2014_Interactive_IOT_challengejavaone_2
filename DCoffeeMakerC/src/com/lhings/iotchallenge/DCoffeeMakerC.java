@@ -56,7 +56,7 @@ public class DCoffeeMakerC extends LhingsDevice {
 
 	public DCoffeeMakerC() {
 		// substituir credenciales con las del coworking antes de enviar a JavaOne
- 	   	super("lhings@gmail.com", "coworking", 5000, "CoffeeMaker");
+ 	   	super("david@lhings.com", "coworking", 5000, "CoffeeMaker");
 		System.setProperty("jsse.enableSNIExtension", "false");
 
 	}
