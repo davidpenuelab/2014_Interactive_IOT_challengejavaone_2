@@ -194,6 +194,8 @@ public class DTable extends LhingsDevice {
         setAvailable(false);
         setAvailableOFF();
         webService_sendMessageLhings(apikey,devicesUser.get("PlugLhings"), "CIAO! See you soon in our Co-working space!");
+        webService_sendCheckStatus();
+        checkIn = false;
         System.out.println("checkout!");
 	}
 
