@@ -304,12 +304,6 @@ public class DTable extends LhingsDevice {
 			BufferedReader br = new BufferedReader(new InputStreamReader(
                                                                          (conn.getInputStream())));
             
-			String output;
-			System.out.println("Output from Server .... \n");
-			while ((output = br.readLine()) != null) {
-				System.out.println(output);
-			}
-            
 			conn.disconnect();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -342,11 +336,6 @@ public class DTable extends LhingsDevice {
             BufferedReader br = new BufferedReader(new InputStreamReader(
                                                                          (response.getEntity().getContent())));
             
-            String output;
-            System.out.println("Output from Server .... \n");
-            while ((output = br.readLine()) != null) {
-                System.out.println(output);
-            }
         } catch (IOException | URISyntaxException e) {
             System.out.println("Error "+e.toString());
         } finally {
@@ -407,90 +396,90 @@ public class DTable extends LhingsDevice {
     }
 
     private void webService_sendCheckStatus(String apikeyUser){
-        System.out.println("TODO: send checkStatus to DesktopApp");
-//        CloseableHttpClient httpClient=null;
-//        CloseableHttpResponse response=null;
-//        String uuidDesktopApp = devicesUser.get("Interface");
-//        try {
-//            
-//            httpClient = HttpClients.createDefault();
-//            URI uri = new URI("https://www.lhings.com/laas/api/v1/devices/"+uuidDesktopApp+"/actions/checkStatus");
-//            HttpPost httpPost = new HttpPost(uri);
-//            httpPost.setHeader("X-Api-Key", apikeyUser);
-//            httpPost.setHeader("Accept", "application/json");
-//            httpPost.setHeader("Content-type", "application/json");
-//            String json="[]";
-//            HttpEntity postBody = new StringEntity(json);
-//            httpPost.setEntity(postBody);
-//            
-//            response = httpClient.execute(httpPost);
-//            
-//            if (response.getStatusLine().getStatusCode() != 200) {
-//                System.out.println("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
-//                return;
-//            }
-//            
-//            BufferedReader br = new BufferedReader(new InputStreamReader(
-//                                                                         (response.getEntity().getContent())));
-//            
-//        }   catch (IOException | URISyntaxException e) {
-//            System.out.println("Error "+e.toString());
-//        } finally {
-//            try{
-//                if(response!=null){
-//                    response.close();
-//                }
-//                if(httpClient!=null){
-//                    httpClient.close();
-//                }
-//            }catch(IOException ex) {
-//                System.out.println("Finally Error "+ex.toString());
-//            }
-//        }
+        System.out.println("send checkStatus to DesktopApp");
+        CloseableHttpClient httpClient=null;
+        CloseableHttpResponse response=null;
+        String uuidDesktopApp = devicesUser.get("Interface");
+        try {
+            
+            httpClient = HttpClients.createDefault();
+            URI uri = new URI("https://www.lhings.com/laas/api/v1/devices/"+uuidDesktopApp+"/actions/checkStatus");
+            HttpPost httpPost = new HttpPost(uri);
+            httpPost.setHeader("X-Api-Key", apikeyUser);
+            httpPost.setHeader("Accept", "application/json");
+            httpPost.setHeader("Content-type", "application/json");
+            String json="[]";
+            HttpEntity postBody = new StringEntity(json);
+            httpPost.setEntity(postBody);
+            
+            response = httpClient.execute(httpPost);
+            
+            if (response.getStatusLine().getStatusCode() != 200) {
+                System.out.println("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
+                return;
+            }
+            
+            BufferedReader br = new BufferedReader(new InputStreamReader(
+                                                                         (response.getEntity().getContent())));
+            
+        }   catch (IOException | URISyntaxException e) {
+            System.out.println("Error "+e.toString());
+        } finally {
+            try{
+                if(response!=null){
+                    response.close();
+                }
+                if(httpClient!=null){
+                    httpClient.close();
+                }
+            }catch(IOException ex) {
+                System.out.println("Finally Error "+ex.toString());
+            }
+        }
     }
 
     private void webService_sendCheckInToDesktopApp(String apiKeyUser, String apikeyCoworking){
-        System.out.println("TODO: send checkIn to DesktopApp, will send the apikey of the Coworking: "+apikeyCoworking);
-//        CloseableHttpClient httpClient=null;
-//        CloseableHttpResponse response=null;
-//        String uuidDesktopApp = devicesUser.get("Interface");
-//
-//        try {
-//            
-//            httpClient = HttpClients.createDefault();
-//            URI uri = new URI("https://www.lhings.com/laas/api/v1/devices/"+uuidDesktopApp+"/actions/checkIn");
-//            HttpPost httpPost = new HttpPost(uri);
-//            httpPost.setHeader("X-Api-Key", apiKeyUser);
-//            httpPost.setHeader("Accept", "application/json");
-//            httpPost.setHeader("Content-type", "application/json");
-//            String json="[{ \"name\": \"apikey\", \"value\": \""+apikeyCoworking+"\"}]";
-//            HttpEntity postBody = new StringEntity(json);
-//            httpPost.setEntity(postBody);
-//            
-//            response = httpClient.execute(httpPost);
-//            
-//            if (response.getStatusLine().getStatusCode() != 200) {
-//                System.out.println("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
-//                return;
-//            }
-//            
-//            BufferedReader br = new BufferedReader(new InputStreamReader(
-//                                                                         (response.getEntity().getContent())));
-//            
-//        }   catch (IOException | URISyntaxException e) {
-//            System.out.println("Error "+e.toString());
-//        } finally {
-//            try{
-//                if(response!=null){
-//                    response.close();
-//                }
-//                if(httpClient!=null){
-//                    httpClient.close();
-//                }
-//            }catch(IOException ex) {
-//                System.out.println("Finally Error "+ex.toString());
-//            }
-//        }
+        System.out.println("Send checkIn to DesktopApp, will send the apikey of the Coworking: "+apikeyCoworking);
+        CloseableHttpClient httpClient=null;
+        CloseableHttpResponse response=null;
+        String uuidDesktopApp = devicesUser.get("Interface");
+
+        try {
+            
+            httpClient = HttpClients.createDefault();
+            URI uri = new URI("https://www.lhings.com/laas/api/v1/devices/"+uuidDesktopApp+"/actions/checkIn");
+            HttpPost httpPost = new HttpPost(uri);
+            httpPost.setHeader("X-Api-Key", apiKeyUser);
+            httpPost.setHeader("Accept", "application/json");
+            httpPost.setHeader("Content-type", "application/json");
+            String json="[{ \"name\": \"apikey\", \"value\": \""+apikeyCoworking+"\"}]";
+            HttpEntity postBody = new StringEntity(json);
+            httpPost.setEntity(postBody);
+            
+            response = httpClient.execute(httpPost);
+            
+            if (response.getStatusLine().getStatusCode() != 200) {
+                System.out.println("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
+                return;
+            }
+            
+            BufferedReader br = new BufferedReader(new InputStreamReader(
+                                                                         (response.getEntity().getContent())));
+            
+        }   catch (IOException | URISyntaxException e) {
+            System.out.println("Error "+e.toString());
+        } finally {
+            try{
+                if(response!=null){
+                    response.close();
+                }
+                if(httpClient!=null){
+                    httpClient.close();
+                }
+            }catch(IOException ex) {
+                System.out.println("Finally Error "+ex.toString());
+            }
+        }
     }
 
     // ************************************
