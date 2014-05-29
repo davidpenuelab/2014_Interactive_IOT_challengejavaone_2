@@ -163,18 +163,18 @@ public class DTable extends LhingsDevice {
     @Action (name = "toggleAvailable", description = "Toggle between green/red light of availability of user", argumentNames = {}, argumentTypes = {})
 	public void toggleAvailable(){
 		setAvailable(!available);
-        webService_sendCheckStatus(apikeyUser);
+        webService_sendCheckStatus(userApikey);
     }
 
     @Action (name = "toggleLight", description = "Toggle light on/off ", argumentNames = {}, argumentTypes = {})
     public void toggleLight(){
         setLightOn(!on);
-        webService_sendCheckStatus(apikeyUser);
+        webService_sendCheckStatus(userApikey);
     }
     @Action (name = "requestTaxi", description = "Requests a taxi", argumentNames = {}, argumentTypes = {})
 	public void requestTaxi(){
         System.out.println("TODO: Request a Taxi!");
-        webService_sendCheckStatus(apikeyUser);
+        webService_sendCheckStatus(userApikey);
 	}
 
     // ************************************
@@ -290,7 +290,7 @@ public class DTable extends LhingsDevice {
 	}
 
     // ************* private methods :  webservices ***************
-	private void webService_Light(String payload, String lightNumber) {
+	private void webService_light(String payload, String lightNumber) {
 		try {
 			URL hueColorService = new URL("http://192.168.0.111/api/newdeveloper/lights/"+lightNumber+"/state");
 			HttpURLConnection conn = (HttpURLConnection) hueColorService.openConnection();
