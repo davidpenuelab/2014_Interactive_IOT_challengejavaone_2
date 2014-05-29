@@ -233,7 +233,7 @@ public class DTable extends LhingsDevice {
         String uuidPlugLhings = devicesUser.get("PlugLhings");
         sendMessageLhings(apikey, uuidPlugLhings, "Welcome to the Co-working space");
     }
-    private void getDevicesFromCoworking(){
+    private void getDevicesFromCoworking(String apikeyUser){
         devicesCoworking = getAllDevicesInAccount(coworkingApiKey);
         String uuidDCoffeeMaker = devicesCoworking.get("DCoffeeMakerC");
         sendApikeyToCoffee(apikeyUser, uuidDCoffeeMaker);
@@ -289,6 +289,8 @@ public class DTable extends LhingsDevice {
 
     private void sendApikeyToCoffee(String apikeyUser, String uuidCoffeMaker){
         System.out.println("DOING: Send Apikey of user to coffeemaker");
+        CloseableHttpClient httpClient=null;
+        CloseableHttpResponse response=null;
         try {
 
             httpClient = HttpClients.createDefault();
