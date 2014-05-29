@@ -68,7 +68,7 @@ public class DCoffeeMakerC extends LhingsDevice {
     static RP_Rfid rfid;
     
 	private static boolean enablePower = false;
-	public static long minutesForCoffe = 500000;
+	public static long minutesForCoffe = 300000;
 	public static long lastTimeChecked;
 	private boolean eventSent = false;
     Map<String,String> devices;
