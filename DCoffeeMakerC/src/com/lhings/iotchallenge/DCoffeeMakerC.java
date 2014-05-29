@@ -68,7 +68,7 @@ public class DCoffeeMakerC extends LhingsDevice {
     static RP_Rfid rfid;
     
 	private static boolean enablePower = false;
-	public static long minutesForCoffe = 300000;
+	public static long minutesForCoffe = 120000;
 	public static long lastTimeChecked;
 	private boolean eventSent = false;
     Map<String,String> devices;
@@ -211,7 +211,7 @@ public class DCoffeeMakerC extends LhingsDevice {
 	}
 
     private void sendEventCoffeeMade(String apikey)throws IOException{
-        devices = getAllDevicesInAccount(apikey);        
+        devices = getAllDevicesInAccount(apikey);
         sendNotificationToPlugLhings(apikey);
     }
 
