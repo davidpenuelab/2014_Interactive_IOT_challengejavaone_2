@@ -68,6 +68,9 @@ public class DTable extends LhingsDevice {
     Map<String,String> devicesUser;
     Map<String,String> devicesCoworking;
     
+    String normalLight = "3";
+    String availableLight = "4";
+    
 	public DTable() {
 		// Co-working space credenti
         super("david@lhings.com", "coworking", 5000, "Table");
@@ -191,10 +194,10 @@ public class DTable extends LhingsDevice {
 
     private void setLightOn(boolean value){
         if (this.on == false && value == true){
-			callWebService_lightOnOff("{\"on\":true}");
+			webServiceLight("{\"on\":true}",normalLight);
 		}
 		else if (this.on == true && value == false){
-			callWebService_lightOnOff("{\"on\":false}");
+			webServiceLight("{\"on\":false}",normalLight);
 		}
         
 		this.on = value;
@@ -207,11 +210,11 @@ public class DTable extends LhingsDevice {
     
 	private void setAvailable(boolean available) {
 		if (this.available == false && available == true){
-			callWebService_available("{\"on\":true, \"hue\":25000}");//green {"on":true, "hue": 25000}
+			webServiceLight("{\"on\":true, \"hue\":25000}",availableLight);//green {"on":true, "hue": 25000}
 			sendAvailable = true;
 		}
 		else if (this.available == true && available == false){
-			callWebService_available("{\"on\":true, \"hue\":1000}");//red {"on":true, "hue": 1000}
+			webServiceLight("{\"on\":true, \"hue\":1000}",availableLight);//red {"on":true, "hue": 1000}
 			sendNotAvailable = true;
 		}
         
@@ -224,7 +227,7 @@ public class DTable extends LhingsDevice {
 	}
 
     private void setAvailableOFF() {
-        callWebService_available("{\"on\":false}");
+        webServiceLight("{\"on\":false}",availableLight);
         System.out.println("Turning off Available light");
 	}
 
@@ -288,64 +291,14 @@ public class DTable extends LhingsDevice {
 
     }
 
-    private void sendApikeyToCoffee(String apikeyUser, String uuidCoffeMaker){
-        System.out.println("DOING: Send Apikey of user to coffeemaker");
-        System.out.println("Apikey Coworking->"+coworkingApiKey);
-        System.out.println("Apikey User->"+apikeyUser);
-        System.out.println("Apikey UUID Coffeemaker->"+uuidCoffeMaker);
-        CloseableHttpClient httpClient=null;
-        CloseableHttpResponse response=null;
-        try {
-
-            httpClient = HttpClients.createDefault();
-            URI uri = new URI("https://www.lhings.com/laas/api/v1/devices/"+uuidCoffeMaker+"/actions/AllowUser");
-            HttpPost httpPost = new HttpPost(uri);
-            httpPost.setHeader("X-Api-Key", coworkingApiKey);
-            httpPost.setHeader("Accept", "application/json");
-            httpPost.setHeader("Content-type", "application/json");
-            String json="[{ \"name\": \"apikey\", \"value\": \""+apikeyUser+"\"}]";
-            HttpEntity postBody = new StringEntity(json);
-            httpPost.setEntity(postBody);
-
-            response = httpClient.execute(httpPost);
-
-            if (response.getStatusLine().getStatusCode() != 200) {
-                System.out.println("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
-                return;
-            }
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(
-            (response.getEntity().getContent())));
-
-            String output;
-            System.out.println("Output from Server .... \n");
-            while ((output = br.readLine()) != null) {
-                System.out.println(output);
-            }
-        }   catch (IOException | URISyntaxException e) {
-            System.out.println("Error "+e.toString());
-        } finally {
-            try{
-                if(response!=null){
-                    response.close();
-                }
-                if(httpClient!=null){
-                    httpClient.close();
-                }
-            }catch(IOException ex) {
-                System.out.println("Finally Error "+ex.toString());
-            }
-        }
-    }
-
     private void sendGoodByeMessage(String apikey){
         System.out.println("TODO: Send goodby to Pereda and Lhings");
+        
     }
 
     /*
      TODO: send message to pereda of welcome and goodbye
      send confirmation message when action is done from pereda
-     send api key to coffeemaker
      */
 	private Map<String,String> getAllDevicesInAccount(String apikey) {
 
@@ -380,7 +333,37 @@ public class DTable extends LhingsDevice {
 	}
 
     // ************* private methods (Lamp related) ***************
-	private void callWebService_available(String payload) {
+	private void webServiceLight(String payload, String lightNumber) {
+		try {
+			URL hueColorService = new URL("http://192.168.0.111/api/newdeveloper/lights/"+lightNumber+"/state");
+			HttpURLConnection conn = (HttpURLConnection) hueColorService.openConnection();
+			conn.setDoOutput(true);
+			conn.setRequestMethod("PUT");
+			conn.setRequestProperty("Content-Type", "application/json");
+            
+			String input = payload;
+            
+			OutputStream os = conn.getOutputStream();
+			os.write(input.getBytes());
+			os.flush();
+            
+			BufferedReader br = new BufferedReader(new InputStreamReader(
+                                                                         (conn.getInputStream())));
+            
+			String output;
+			System.out.println("Output from Server .... \n");
+			while ((output = br.readLine()) != null) {
+				System.out.println(output);
+			}
+            
+			conn.disconnect();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	} 
+
+    
+    private void callWebService_available(String payload) {
 		try {
 			URL hueColorService = new URL("http://192.168.0.111/api/newdeveloper/lights/4/state");
 			HttpURLConnection conn = (HttpURLConnection) hueColorService.openConnection();
@@ -438,6 +421,52 @@ public class DTable extends LhingsDevice {
 		}
 	} 
     
+    private void sendApikeyToCoffee(String apikeyUser, String uuidCoffeMaker){
+        CloseableHttpClient httpClient=null;
+        CloseableHttpResponse response=null;
+        try {
+            
+            httpClient = HttpClients.createDefault();
+            URI uri = new URI("https://www.lhings.com/laas/api/v1/devices/"+uuidCoffeMaker+"/actions/AllowUser");
+            HttpPost httpPost = new HttpPost(uri);
+            httpPost.setHeader("X-Api-Key", coworkingApiKey);
+            httpPost.setHeader("Accept", "application/json");
+            httpPost.setHeader("Content-type", "application/json");
+            String json="[{ \"name\": \"apikey\", \"value\": \""+apikeyUser+"\"}]";
+            HttpEntity postBody = new StringEntity(json);
+            httpPost.setEntity(postBody);
+            
+            response = httpClient.execute(httpPost);
+            
+            if (response.getStatusLine().getStatusCode() != 200) {
+                System.out.println("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
+                return;
+            }
+            
+            BufferedReader br = new BufferedReader(new InputStreamReader(
+                                                                         (response.getEntity().getContent())));
+            
+            String output;
+            System.out.println("Output from Server .... \n");
+            while ((output = br.readLine()) != null) {
+                System.out.println(output);
+            }
+        }   catch (IOException | URISyntaxException e) {
+            System.out.println("Error "+e.toString());
+        } finally {
+            try{
+                if(response!=null){
+                    response.close();
+                }
+                if(httpClient!=null){
+                    httpClient.close();
+                }
+            }catch(IOException ex) {
+                System.out.println("Finally Error "+ex.toString());
+            }
+        }
+    }
+
     // ************************************
     // ************* MAIN *****************
     // ************************************
