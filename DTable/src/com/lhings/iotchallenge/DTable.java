@@ -235,7 +235,7 @@ public class DTable extends LhingsDevice {
     }
     private void getDevicesFromCoworking(String apikeyUser){
         devicesCoworking = getAllDevicesInAccount(coworkingApiKey);
-        String uuidDCoffeeMaker = devicesCoworking.get("DCoffeeMakerC");
+        String uuidDCoffeeMaker = devicesCoworking.get("CoffeeMaker");
         System.out.println("DEVICES FROM COWORKING"+uuidDCoffeeMaker.toString());
         sendApikeyToCoffee(apikeyUser, uuidDCoffeeMaker);
     }
