@@ -173,7 +173,6 @@ public class DTable extends LhingsDevice {
     // ************************************
 
 	private void doCheckin(String apikey){
-        sendApikeyToCoffee(apikey);
         setLightOn(true);
         setAvailable(true);
         getDevicesFromUser(apikey);//and send welcome, send to desktop app apikey
@@ -234,8 +233,8 @@ public class DTable extends LhingsDevice {
         String uuidPlugLhings = devicesUser.get("PlugLhings");
         sendMessageLhings(apikey, uuidPlugLhings, "Welcome to the Co-working space");
     }
-    private void getDevicesFromCoworking(String apikeyUser){
-        devicesCoworking = getAllDevicesInAccount(apikey);
+    private void getDevicesFromCoworking(){
+        devicesCoworking = getAllDevicesInAccount(coworkingApiKey);
         String uuidDCoffeeMaker = devicesCoworking.get("DCoffeeMakerC");
         sendApikeyToCoffee(apikeyUser, uuidDCoffeeMaker);
     }
