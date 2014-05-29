@@ -289,14 +289,16 @@ public class DTable extends LhingsDevice {
 
     private void sendApikeyToCoffee(String apikeyUser, String uuidCoffeMaker){
         System.out.println("DOING: Send Apikey of user to coffeemaker");
+        System.out.println("Apikey Coworking->"+coworkingApiKey);
+        System.out.println("Apikey User->"+apikeyUser);
+        System.out.println("Apikey UUID Coffeemaker->"+uuidCoffeMaker);
         CloseableHttpClient httpClient=null;
         CloseableHttpResponse response=null;
         try {
 
             httpClient = HttpClients.createDefault();
-            URI uri = new URI("https://www.lhings.com/laas/api/v1/devices/"+uuidCoffeMaker+"/actions/allowUser");
+            URI uri = new URI("https://www.lhings.com/laas/api/v1/devices/"+uuidCoffeMaker+"/actions/AllowUser");
             HttpPost httpPost = new HttpPost(uri);
-
             httpPost.setHeader("X-Api-Key", coworkingApiKey);
             httpPost.setHeader("Accept", "application/json");
             httpPost.setHeader("Content-type", "application/json");
