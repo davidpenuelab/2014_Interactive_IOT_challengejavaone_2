@@ -252,7 +252,7 @@ public class DTable extends LhingsDevice {
             httpPost.setHeader("X-Api-Key", apikey);
             httpPost.setHeader("Accept", "application/json");
             httpPost.setHeader("Content-type", "application/json");
-            String json="[{ \"name\": \"text\", \"value\": \""+message+""}]";
+            String json="[{ \"name\": \"text\", \"value\": \""+message+"\"}]";
             HttpEntity postBody = new StringEntity(json);
             httpPost.setEntity(postBody);
             
@@ -299,7 +299,7 @@ public class DTable extends LhingsDevice {
             httpPost.setHeader("X-Api-Key", coworkingApiKey);
             httpPost.setHeader("Accept", "application/json");
             httpPost.setHeader("Content-type", "application/json");
-            String json="[{ \"name\": \"apikey\", \"value\": \""+apikeyUser+""}]";
+            String json="[{ \"name\": \"apikey\", \"value\": \""+apikeyUser+"\"}]";
             HttpEntity postBody = new StringEntity(json);
             httpPost.setEntity(postBody);
 
