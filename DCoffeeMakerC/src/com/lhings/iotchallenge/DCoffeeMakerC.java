@@ -211,10 +211,8 @@ public class DCoffeeMakerC extends LhingsDevice {
 	}
 
     private void sendEventCoffeeMade(String apikey)throws IOException{
-        devices = getAllDevicesInAccount(apikey);
-        
+        devices = getAllDevicesInAccount(apikey);        
         sendNotificationToPlugLhings(apikey);
-        sendNotificationToDesktopApp(apikey);
     }
 
     // ************************************

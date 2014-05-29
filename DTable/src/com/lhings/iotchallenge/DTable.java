@@ -183,8 +183,6 @@ public class DTable extends LhingsDevice {
         setAvailable(true);
         getDevicesFromUser(apikey);//and send welcome, send to desktop app apikey
         getDevicesFromCoworking(apikey);
-        System.out.println("DEVICES USER: "+devicesUser.toString());
-        System.out.println("DEVICES COWORKING: "+devicesCoworking.toString());
 	}
     
     private void doCheckout(String apikey){
@@ -194,9 +192,9 @@ public class DTable extends LhingsDevice {
         setAvailable(false);
         setAvailableOFF();
         webService_sendMessageLhings(apikey,devicesUser.get("PlugLhings"), "CIAO! See you soon in our Co-working space!");
-        webService_sendCheckStatus();
+        webService_sendCheckStatus(apikey);
         checkIn = false;
-        System.out.println("checkout!");
+        System.out.println("CIAO!See you soon!");
 	}
 
     private void setLightOn(boolean value){
@@ -248,11 +246,6 @@ public class DTable extends LhingsDevice {
         devicesCoworking = getAllDevicesInAccount(coworkingApiKey);
         String uuidDCoffeeMaker = devicesCoworking.get("CoffeeMaker");
         webService_sendApikeyToCoffee(apikeyUser, uuidDCoffeeMaker);
-    }
-
-    private void sendGoodByeMessage(String apikey){
-        System.out.println("TODO: Send goodby to Pereda and Lhings");
-        
     }
 
 	private Map<String,String> getAllDevicesInAccount(String apikey) {
