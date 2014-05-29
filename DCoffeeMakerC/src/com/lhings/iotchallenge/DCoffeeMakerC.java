@@ -56,7 +56,7 @@ public class DCoffeeMakerC extends LhingsDevice {
 
 	public DCoffeeMakerC() {
 		// substituir credenciales con las del coworking antes de enviar a JavaOne
- 	   	super("davidpenuelab@gmail.com", "fabrica", 5000, "CoffeeMaker");
+ 	   	super("lhings@gmail.com", "fabrica", 5000, "CoffeeMaker");
 		System.setProperty("jsse.enableSNIExtension", "false");
 
 	}
@@ -179,7 +179,7 @@ public class DCoffeeMakerC extends LhingsDevice {
 	}
 
 	// *********** LAMP CONTROL *********************
-	@Action(name = "AllowUser", description = "", argumentNames = {}, argumentTypes = {})
+	@Action(name = "AllowUser", description = "", argumentNames = {"apikey"}, argumentTypes = {"String"})
 	public void allowUser(String payload) {
 		storeApiKey(payload);
 		System.out.println("Successfully stored apikey " + payload);
