@@ -65,7 +65,8 @@ public class DTable extends LhingsDevice {
     
     private boolean on=false;
 	private boolean available = false;
-    Map<String,String> devices;
+    Map<String,String> devicesUser;
+    Map<String,String> devicesCoworking;
     
 	public DTable() {
 		// Co-working space credenti
@@ -176,6 +177,7 @@ public class DTable extends LhingsDevice {
         setLightOn(true);
         setAvailable(true);
         getDevicesFromUser(apikey);//and send welcome, send to desktop app apikey
+        getDevicesFromCoworking(apikey);
 	}
     
     private void doCheckout(String apikey){
@@ -184,7 +186,7 @@ public class DTable extends LhingsDevice {
         setLightOn(false);
         setAvailable(false);
         setAvailableOFF();
-        sendMessageLhings(apikey,devices.get("PlugLhings"), "CIAO! See you soon in our Co-working space!");
+        sendMessageLhings(apikey,devicesUser.get("PlugLhings"), "CIAO! See you soon in our Co-working space!");
         System.out.println("checkout!");
 	}
 
@@ -228,9 +230,14 @@ public class DTable extends LhingsDevice {
 	}
 
     private void getDevicesFromUser(String apikey){
-        devices = getAllDevicesInAccount(apikey);
-        String uuidPlugLhings = devices.get("PlugLhings");
+        devicesUser = getAllDevicesInAccount(apikey);
+        String uuidPlugLhings = devicesUser.get("PlugLhings");
         sendMessageLhings(apikey, uuidPlugLhings, "Welcome to the Co-working space");
+    }
+    private void getDevicesFromCoworking(String apikeyUser){
+        devicesCoworking = getAllDevicesInAccount(apikey);
+        String uuidDCoffeeMaker = devicesCoworking.get("DCoffeeMakerC");
+        sendApikeyToCoffee(apikeyUser, uuidDCoffeeMaker);
     }
     
     private void sendMessageLhings(String apikey, String uuid, String message){
@@ -281,21 +288,63 @@ public class DTable extends LhingsDevice {
 
     }
 
-    private void sendApikeyToCoffee(String apikey){
-        System.out.println("TODO: Send Apikey of user to coffeemaker");
+    private void sendApikeyToCoffee(String apikeyUser, String uuidCoffeMaker){
+        System.out.println("DOING: Send Apikey of user to coffeemaker");
+        try {
+
+            httpClient = HttpClients.createDefault();
+            URI uri = new URI("https://www.lhings.com/laas/api/v1/devices/"+uuidCoffeMaker+"/actions/allowUser");
+            HttpPost httpPost = new HttpPost(uri);
+
+            httpPost.setHeader("X-Api-Key", coworkingApiKey);
+            httpPost.setHeader("Accept", "application/json");
+            httpPost.setHeader("Content-type", "application/json");
+            String json="[{ \"name\": \"apikey\", \"value\": \""+apikeyUser+""}]";
+            HttpEntity postBody = new StringEntity(json);
+            httpPost.setEntity(postBody);
+
+            response = httpClient.execute(httpPost);
+
+            if (response.getStatusLine().getStatusCode() != 200) {
+                System.out.println("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
+                return;
+            }
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(
+            (response.getEntity().getContent())));
+
+            String output;
+            System.out.println("Output from Server .... \n");
+            while ((output = br.readLine()) != null) {
+                System.out.println(output);
+            }
+        }   catch (IOException | URISyntaxException e) {
+            System.out.println("Error "+e.toString());
+        } finally {
+            try{
+                if(response!=null){
+                    response.close();
+                }
+                if(httpClient!=null){
+                    httpClient.close();
+                }
+            }catch(IOException ex) {}
+
+            System.out.println("Finally Error "+ex.toString());
+        }
     }
-    
+
     private void sendGoodByeMessage(String apikey){
         System.out.println("TODO: Send goodby to Pereda and Lhings");
     }
-    
+
     /*
      TODO: send message to pereda of welcome and goodbye
      send confirmation message when action is done from pereda
      send api key to coffeemaker
      */
 	private Map<String,String> getAllDevicesInAccount(String apikey) {
-		
+
 		try {
 			CloseableHttpClient httpclient = HttpClients.createDefault();
 			HttpGet get = new HttpGet("https://www.lhings.com/laas/api/v1/devices/");
