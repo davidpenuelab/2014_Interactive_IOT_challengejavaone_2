@@ -362,65 +362,6 @@ public class DTable extends LhingsDevice {
 		}
 	} 
 
-    
-    private void callWebService_available(String payload) {
-		try {
-			URL hueColorService = new URL("http://192.168.0.111/api/newdeveloper/lights/4/state");
-			HttpURLConnection conn = (HttpURLConnection) hueColorService.openConnection();
-			conn.setDoOutput(true);
-			conn.setRequestMethod("PUT");
-			conn.setRequestProperty("Content-Type", "application/json");
-
-			String input = payload;
-
-			OutputStream os = conn.getOutputStream();
-			os.write(input.getBytes());
-			os.flush();
-
-			BufferedReader br = new BufferedReader(new InputStreamReader(
-					(conn.getInputStream())));
-
-			String output;
-			System.out.println("Output from Server .... \n");
-			while ((output = br.readLine()) != null) {
-				System.out.println(output);
-			}
-
-			conn.disconnect();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	} 
-
-    private void callWebService_lightOnOff(String payload) {
-		try {
-			URL hueColorService = new URL("http://192.168.0.111/api/newdeveloper/lights/3/state");
-			HttpURLConnection conn = (HttpURLConnection) hueColorService.openConnection();
-			conn.setDoOutput(true);
-			conn.setRequestMethod("PUT");
-			conn.setRequestProperty("Content-Type", "application/json");
-            
-			String input = payload;
-            
-			OutputStream os = conn.getOutputStream();
-			os.write(input.getBytes());
-			os.flush();
-            
-			BufferedReader br = new BufferedReader(new InputStreamReader(
-                                                                         (conn.getInputStream())));
-            
-			String output;
-			System.out.println("Output from Server .... \n");
-			while ((output = br.readLine()) != null) {
-				System.out.println(output);
-			}
-            
-			conn.disconnect();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	} 
-    
     private void sendApikeyToCoffee(String apikeyUser, String uuidCoffeMaker){
         CloseableHttpClient httpClient=null;
         CloseableHttpResponse response=null;
