@@ -70,7 +70,7 @@ public class DTable extends LhingsDevice {
     
 	public DTable() {
 		// Co-working space credenti
-        super("david@lhings.com", "coworking", 5000, "DTable");
+        super("david@lhings.com", "coworking", 5000, "Table");
 
 	}
 

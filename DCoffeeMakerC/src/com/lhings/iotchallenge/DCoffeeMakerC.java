@@ -50,10 +50,11 @@ public class DCoffeeMakerC extends LhingsDevice {
     static RP_Rfid rfid;
     
 	private static boolean enablePower = false;
-	public static long minutesForCoffe = 3000;
+	public static long minutesForCoffe = 50000;
 	public static long lastTimeChecked;
 	private boolean eventSent = false;
-
+    Map<String,String> devices;
+    
 	public DCoffeeMakerC() {
 		// substituir credenciales con las del coworking antes de enviar a JavaOne
  	   	super("david@lhings.com", "coworking", 5000, "CoffeeMaker");
@@ -133,42 +134,113 @@ public class DCoffeeMakerC extends LhingsDevice {
     }
 
     private void sendEventCoffeeMade(String apikey)throws IOException{
-        sendEvent(apikey);
+        devices = getAllDevicesInAccount(apikey);
+        
+        sendNotificationToPlugLhings(apikey);
+        sendNotificationToDesktopApp(apikey);
     }
 
-	private void sendEvent(String apikey) throws IOException{
+	private void sendNotificationToPlugLhings(String apikey) throws IOException{
         System.out.println("I will try to send an Event in Account: "+apikey);
-		Map<String,String> devices = getAllDevicesInAccount(apikey);
-		String uuid = devices.get("CoffeeMaker");
-		CloseableHttpClient httpclient = HttpClients.createDefault();
-		HttpPut put = new HttpPut("https://www.lhings.com/laas/api/v1/devices/" + uuid + "/events/CoffeeMade");
-		put.addHeader("X-Api-Key", apikey);
-
-        CloseableHttpResponse response = httpclient.execute(put);
-
-		if (response.getStatusLine().getStatusCode() != 200) {
-			System.err.println("Device.list request failed: " + response.getStatusLine());
-            try{
-                response.close();
-            }
-            catch (IOException e){
-                e.printStackTrace(System.err);
+		String uuid = devices.get("PlugLhings");
+            //sent to Pereda event
+		CloseableHttpClient httpClient=null;
+        CloseableHttpResponse response=null;
+        try {
+            
+            httpClient = HttpClients.createDefault();
+            URI uri = new URI("https://www.lhings.com/laas/api/v1/devices/"+uuid+"/actions/notifications");
+            HttpPost httpPost = new HttpPost(uri);
+            
+            httpPost.setHeader("X-Api-Key", apikey);
+            httpPost.setHeader("Accept", "application/json");
+            httpPost.setHeader("Content-type", "application/json");
+            String json="[{ \"name\": \"text\", \"value\": \""+message+"\"}]";
+            HttpEntity postBody = new StringEntity(json);
+            httpPost.setEntity(postBody);
+            
+            response = httpClient.execute(httpPost);
+            
+            if (response.getStatusLine().getStatusCode() != 200) {
+                System.out.println("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
+                return;
             }
             
-		}
-        try{
-            String responseBody = EntityUtils.toString(response.getEntity());
-            System.out.println(responseBody);
-            response.close();
-           
+            BufferedReader br = new BufferedReader(new InputStreamReader(
+                                                                         (response.getEntity().getContent())));
+            
+            String output;
+            System.out.println("Output from Server .... \n");
+            while ((output = br.readLine()) != null) {
+                System.out.println(output);
+            }
+        } catch (IOException | URISyntaxException e) {
+            System.out.println("Error "+e.toString());
+        } finally {
+            try{
+                if(response!=null){
+                    response.close();
+                }
+                if(httpClient!=null){
+                    httpClient.close();
+                }
+            }catch(IOException ex) {
+                System.out.println("Finally Error "+ex.toString());
+            }
         }
-        catch (IOException e){
-            e.printStackTrace(System.err);
-        }
-		
-
 	}
-
+    
+    private void sendNotificationToDesktopApp(String apikey) throws IOException{
+        System.out.println("TODO: I will try trigger action in Account: "+apikey);
+//		String uuid = devices.get("Interface");
+//            //sent to Pereda event
+//		CloseableHttpClient httpClient=null;
+//        CloseableHttpResponse response=null;
+//        try {
+//            
+//            httpClient = HttpClients.createDefault();
+//            URI uri = new URI("https://www.lhings.com/laas/api/v1/devices/"+uuid+"/actions/requestCoffee");
+//            HttpPost httpPost = new HttpPost(uri);
+//            
+//            httpPost.setHeader("X-Api-Key", apikey);
+//            httpPost.setHeader("Accept", "application/json");
+//            httpPost.setHeader("Content-type", "application/json");
+//            String json="[{ \"name\": \"api\", \"value\": \""+apikey+"\"}]";
+//            HttpEntity postBody = new StringEntity(json);
+//            httpPost.setEntity(postBody);
+//            
+//            response = httpClient.execute(httpPost);
+//            
+//            if (response.getStatusLine().getStatusCode() != 200) {
+//                System.out.println("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
+//                return;
+//            }
+//            
+//            BufferedReader br = new BufferedReader(new InputStreamReader(
+//                                                                         (response.getEntity().getContent())));
+//            
+//            String output;
+//            System.out.println("Output from Server .... \n");
+//            while ((output = br.readLine()) != null) {
+//                System.out.println(output);
+//            }
+//        } catch (IOException | URISyntaxException e) {
+//            System.out.println("Error "+e.toString());
+//        } finally {
+//            try{
+//                if(response!=null){
+//                    response.close();
+//                }
+//                if(httpClient!=null){
+//                    httpClient.close();
+//                }
+//            }catch(IOException ex) {
+//                System.out.println("Finally Error "+ex.toString());
+//            }
+//        }
+		
+        
+	}
 	
 
     // *********** Actions, Events and Status of DCoffeeMakerC *********************
