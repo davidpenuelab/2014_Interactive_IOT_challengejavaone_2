@@ -201,10 +201,11 @@ public class DCoffeeMakerC extends LhingsDevice {
                 System.out.println("Finally Error "+ex.toString());
             }
         }
+        System.out.println("Notification to PlugLhings sent correctly");
 	}
     
     private void sendNotificationToDesktopApp(String apikey) throws IOException{
-        System.out.println("TODO: send action to Pereda of RequestedCoffee "+apikey);
+//        System.out.println("TODO: send action to Pereda of RequestedCoffee "+apikey);
 //		String uuid = devices.get("Interface");
 //            //sent to Pereda event
 //		CloseableHttpClient httpClient=null;
